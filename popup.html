@@ -35,6 +35,28 @@
           </svg>
         </button>
 
+        <!-- Solved Problems Badge with hover breakdown tooltip -->
+        <div class="solved-badge" id="solved-badge" title="Hover to see solved breakdown">
+          <span class="solved-emoji">🏆</span>
+          <span class="solved-count" id="solved-count">0</span>
+          <!-- Premium Hover Tooltip -->
+          <div class="solved-tooltip" id="solved-tooltip">
+            <div class="tooltip-title">Solved Problems</div>
+            <div class="tooltip-row">
+              <span class="lbl easy">Easy</span>
+              <span class="val" id="solved-easy">0</span>
+            </div>
+            <div class="tooltip-row">
+              <span class="lbl medium">Medium</span>
+              <span class="val" id="solved-medium">0</span>
+            </div>
+            <div class="tooltip-row">
+              <span class="lbl hard">Hard</span>
+              <span class="val" id="solved-hard">0</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Streak Fire Counter -->
         <div class="streak-badge" id="streak-container">
           <span class="streak-emoji">🔥</span>
@@ -68,6 +90,14 @@
           <h2 class="question-title" id="question-title">Loading today's challenge...</h2>
         </div>
 
+        <!-- Collapsible Hints Container -->
+        <div class="hint-container" id="hint-container" style="display: none;">
+          <button class="hint-toggle-btn" id="hint-toggle-btn">Need a Hint?</button>
+          <div class="hint-text-wrapper" id="hint-text-wrapper">
+            <p class="hint-text" id="hint-text"></p>
+          </div>
+        </div>
+
         <button class="solve-btn" id="solve-btn">Solve Challenge</button>
       </div>
 
@@ -78,11 +108,64 @@
           <!-- 7 day items injected dynamically -->
         </div>
       </section>
+
+      <!-- Collapsible Achievements Drawer -->
+      <section class="achievements-drawer" id="achievements-drawer">
+        <header class="achievements-header" id="achievements-header">
+          <div class="header-left">
+            <span class="header-emoji">🎖️</span>
+            <span class="header-lbl">Milestones & Achievements</span>
+          </div>
+          <svg class="chevron-icon" id="achievements-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </header>
+        <div class="achievements-content" id="achievements-content">
+          <div class="achievement-column">
+            <h4 class="column-title">Streak 🔥</h4>
+            <div class="achievement-item" id="ach-streak-3">
+              <span class="ach-check">○</span>
+              <span class="ach-name">3 Day Streak</span>
+            </div>
+            <div class="achievement-item" id="ach-streak-7">
+              <span class="ach-check">○</span>
+              <span class="ach-name">7 Day Streak</span>
+            </div>
+            <div class="achievement-item" id="ach-streak-15">
+              <span class="ach-check">○</span>
+              <span class="ach-name">15 Day Streak</span>
+            </div>
+            <div class="achievement-item" id="ach-streak-30">
+              <span class="ach-check">○</span>
+              <span class="ach-name">30 Day Streak</span>
+            </div>
+          </div>
+          <div class="achievement-column">
+            <h4 class="column-title">Solved 🏅</h4>
+            <div class="achievement-item" id="ach-solved-10">
+              <span class="ach-check">○</span>
+              <span class="ach-name">10 Solved</span>
+            </div>
+            <div class="achievement-item" id="ach-solved-50">
+              <span class="ach-check">○</span>
+              <span class="ach-name">50 Solved</span>
+            </div>
+            <div class="achievement-item" id="ach-solved-100">
+              <span class="ach-check">○</span>
+              <span class="ach-name">100 Solved</span>
+            </div>
+            <div class="achievement-item" id="ach-solved-250">
+              <span class="ach-check">○</span>
+              <span class="ach-name">250 Solved</span>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
-      <p id="motivational-quote">Fuel your streak, keep coding!</p>
+      <p id="motivational-quote">Next challenge in 00:00:00</p>
       <button class="refresh-btn" id="refresh-btn" title="Refresh challenge">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>

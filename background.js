@@ -22,7 +22,7 @@ function getLocalDateString(date = new Date()) {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-// 1. GraphQL Fetch for a specific month
+// 1. GraphQL Fetch for a specific month (Updated to fetch hints!)
 async function fetchMonthChallenges(year, month) {
   const query = `
     query dailyCodingChallengeV2($year: Int, $month: Int) {
@@ -35,6 +35,7 @@ async function fetchMonthChallenges(year, month) {
             title
             titleSlug
             difficulty
+            hints
           }
         }
       }
@@ -63,7 +64,91 @@ async function fetchMonthChallenges(year, month) {
   }
 }
 
-// 2. Fetch and Sync all challenges, completions, and streaks
+// 2. Fetch User Profile Solved Stats (New)
+async function fetchUserSolvedStats() {
+  const userQuery = `
+    query globalData {
+      userStatus {
+        username
+        isSignedIn
+      }
+    }
+  `;
+  
+  try {
+    const userResponse = await fetch(LEETCODE_GRAPHQL_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Referer': 'https://leetcode.com'
+      },
+      credentials: 'include',
+      body: JSON.stringify({ query: userQuery })
+    });
+    
+    const userResult = await userResponse.json();
+    const userStatus = userResult.data?.userStatus;
+    
+    if (userStatus && userStatus.isSignedIn && userStatus.username) {
+      const username = userStatus.username;
+      
+      const statsQuery = `
+        query userProblemsSolved($username: String!) {
+          matchedUser(username: $username) {
+            submitStats {
+              acSubmissionNum {
+                difficulty
+                count
+              }
+            }
+          }
+        }
+      `;
+      
+      const statsResponse = await fetch(LEETCODE_GRAPHQL_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Referer': 'https://leetcode.com'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          query: statsQuery,
+          variables: { username }
+        })
+      });
+      
+      const statsResult = await statsResponse.json();
+      const acSubmissions = statsResult.data?.matchedUser?.submitStats?.acSubmissionNum || [];
+      
+      let total = 0, easy = 0, medium = 0, hard = 0;
+      for (const item of acSubmissions) {
+        if (item.difficulty === 'All') total = item.count;
+        else if (item.difficulty === 'Easy') easy = item.count;
+        else if (item.difficulty === 'Medium') medium = item.count;
+        else if (item.difficulty === 'Hard') hard = item.count;
+      }
+      
+      const solvedStats = {
+        username,
+        total,
+        easy,
+        medium,
+        hard,
+        lastUpdated: Date.now()
+      };
+      
+      await chrome.storage.local.set({ solvedStats });
+      console.log('[LeetCode Tracker] Solved stats synced:', solvedStats);
+      return solvedStats;
+    }
+  } catch (error) {
+    console.warn('[LeetCode Tracker] Error fetching user solved stats:', error);
+  }
+  return null;
+}
+
+// 3. Fetch and Sync all challenges, completions, and streaks
 async function fetchAndSyncChallenges() {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -95,13 +180,14 @@ async function fetchAndSyncChallenges() {
 
   for (const c of allChallenges) {
     if (c && c.question && c.date) {
-      // Map challenges
+      // Map challenges (with hints included!)
       challengesMap[c.date] = {
         date: c.date,
         link: c.link,
         title: c.question.title,
         titleSlug: c.question.titleSlug,
-        difficulty: c.question.difficulty
+        difficulty: c.question.difficulty,
+        hints: c.question.hints || []
       };
 
       if (c.date === todayStr) {
@@ -135,7 +221,7 @@ async function fetchAndSyncChallenges() {
   }
   await chrome.storage.local.set(syncData);
 
-  console.log(`[LeetCode Tracker] Synced successfully. Streak: ${newStreak}, Solved dates:`, completedDates);
+  console.log(`[LeetCode Tracker] Synced successfully. Streak: ${newStreak}`);
   return {
     dailyQuestion: todayQuestion || storageData.dailyQuestion,
     completedDates,
@@ -150,7 +236,7 @@ async function fetchDailyQuestion() {
   return synced.dailyQuestion;
 }
 
-// 3. Streak and History Calculations
+// 4. Streak and History Calculations
 function calculateStreak(completedDates, startingDateStr) {
   let streak = 0;
   let checkDate = new Date(startingDateStr);
@@ -182,7 +268,7 @@ async function getActiveStreak(completedDates) {
   return calculateStreak(completedDates, yesterdayStr);
 }
 
-// 4. Notification Alarm Scheduler
+// 5. Notification Alarm Scheduler
 function getNextReminderTime() {
   const now = new Date();
   const currentMs = now.getTime();
@@ -240,7 +326,7 @@ function triggerReminderNotification() {
   });
 }
 
-// 5. Listen for alarms
+// 6. Listen for alarms
 chrome.alarms.onAlarm.addListener((alarm) => {
   console.log('[LeetCode Tracker] Alarm fired:', alarm.name);
   
@@ -251,10 +337,11 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     triggerReminderNotification();
   } else if (alarm.name === 'fetch_daily_periodic') {
     fetchAndSyncChallenges();
+    fetchUserSolvedStats();
   }
 });
 
-// 6. Handle notification click
+// 7. Handle notification click
 chrome.notifications.onClicked.addListener((id) => {
   if (id === 'leetcode_reminder_notification') {
     chrome.storage.local.get(['dailyQuestion'], (data) => {
@@ -265,7 +352,7 @@ chrome.notifications.onClicked.addListener((id) => {
   }
 });
 
-// 7. Message handler
+// 8. Message handler
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'VERIFY_SUBMISSION') {
     const submittedSlug = request.titleSlug;
@@ -293,6 +380,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             lastCompletedDate: todayStr
           });
           
+          // Re-fetch user solved statistics as total solved count has increased!
+          fetchUserSolvedStats();
+          
           sendResponse({
             isDailyCompleted: true,
             dailyData: dailyQuestion,
@@ -306,6 +396,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
       }
       
+      // Otherwise, return false
       sendResponse({ isDailyCompleted: false });
     });
     
@@ -313,17 +404,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   
   if (request.type === 'GET_DASHBOARD_DATA' || request.type === 'FORCE_REFRESH_DAILY') {
-    fetchAndSyncChallenges().then((syncedData) => {
-      sendResponse(syncedData);
+    Promise.all([
+      fetchAndSyncChallenges(),
+      fetchUserSolvedStats()
+    ]).then(([syncedData, solvedStats]) => {
+      sendResponse({
+        ...syncedData,
+        solvedStats: solvedStats || null
+      });
     }).catch((err) => {
       console.warn('[LeetCode Tracker] Sync failed in message listener:', err);
       // Fallback response from cache
-      chrome.storage.local.get(['dailyQuestion', 'completedDates', 'streak', 'challengesMap'], (cache) => {
+      chrome.storage.local.get(['dailyQuestion', 'completedDates', 'streak', 'challengesMap', 'solvedStats'], (cache) => {
         sendResponse({
           dailyQuestion: cache.dailyQuestion || null,
           completedDates: cache.completedDates || [],
           streak: cache.streak || 0,
-          challengesMap: cache.challengesMap || {}
+          challengesMap: cache.challengesMap || {},
+          solvedStats: cache.solvedStats || null
         });
       });
     });
@@ -332,7 +430,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-// 8. Initialize extension
+// 9. Initialize extension
 chrome.runtime.onInstalled.addListener((details) => {
   console.log('[LeetCode Tracker] Extension installed.');
   
@@ -343,8 +441,9 @@ chrome.runtime.onInstalled.addListener((details) => {
     }
   });
 
-  // Fetch daily question right away
+  // Fetch daily question and solved stats right away
   fetchAndSyncChallenges();
+  fetchUserSolvedStats();
 
   // Create periodic alarm to fetch daily question every 4 hours to stay in sync
   chrome.alarms.create('fetch_daily_periodic', { periodInMinutes: 240 });
@@ -359,5 +458,6 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 chrome.runtime.onStartup.addListener(() => {
   fetchAndSyncChallenges();
+  fetchUserSolvedStats();
   scheduleNextReminder();
 });
