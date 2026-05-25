@@ -63,6 +63,8 @@ body {
 
 /* Header */
 .header {
+  position: relative;
+  z-index: 1000;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -70,6 +72,7 @@ body {
   padding-bottom: 8px;
   transition: border-color var(--transition-speed) ease;
 }
+
 
 .logo-area {
   display: flex;
@@ -144,6 +147,7 @@ body {
 }
 
 .streak-badge {
+  position: relative;
   background: rgba(251, 146, 60, 0.06);
   border: 1px solid rgba(251, 146, 60, 0.15);
   border-radius: 50px;
@@ -151,12 +155,14 @@ body {
   display: flex;
   align-items: center;
   gap: 3px;
+  cursor: pointer;
   transition: all var(--transition-speed) ease;
 }
 
 .streak-badge:hover {
   transform: scale(1.03);
   box-shadow: 0 0 8px rgba(251, 146, 60, 0.1);
+  border-color: var(--color-streak);
 }
 
 .streak-emoji {
@@ -467,8 +473,9 @@ body {
   }
 }
 
-/* Solved Problems Badge & Hover Breakdown Tooltip */
+/* Solved & Streak Badges, Hover Breakdown Tooltips */
 .solved-badge {
+  position: relative;
   background: rgba(99, 102, 241, 0.06);
   border: 1px solid rgba(99, 102, 241, 0.15);
   border-radius: 50px;
@@ -476,7 +483,6 @@ body {
   display: flex;
   align-items: center;
   gap: 3px;
-  position: relative;
   cursor: pointer;
   transition: all var(--transition-speed) ease;
 }
@@ -487,7 +493,7 @@ body {
   border-color: var(--color-primary);
 }
 
-.solved-emoji {
+.solved-emoji, .streak-emoji {
   font-size: 11px;
 }
 
@@ -497,7 +503,7 @@ body {
   color: var(--color-primary);
 }
 
-.solved-tooltip {
+.solved-tooltip, .streak-tooltip {
   display: none;
   position: absolute;
   top: calc(100% + 8px);
@@ -507,7 +513,7 @@ body {
   padding: 10px;
   width: 140px;
   box-shadow: 0 4px 20px var(--shadow-color);
-  z-index: 100;
+  z-index: 9999;
   flex-direction: column;
   gap: 6px;
   pointer-events: none;
@@ -516,17 +522,17 @@ body {
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.theme-dark .solved-tooltip {
+.theme-dark .solved-tooltip, .theme-dark .streak-tooltip {
   background: #121722;
   border-color: rgba(255, 255, 255, 0.08);
 }
 
-.theme-light .solved-tooltip {
+.theme-light .solved-tooltip, .theme-light .streak-tooltip {
   background: #ffffff;
   border-color: rgba(15, 23, 42, 0.06);
 }
 
-.solved-badge:hover .solved-tooltip {
+.solved-badge:hover .solved-tooltip, .streak-badge:hover .streak-tooltip {
   display: flex;
   opacity: 1;
   transform: translateY(0);
@@ -612,128 +618,4 @@ body {
   margin-top: 4px;
   background: rgba(99, 102, 241, 0.02);
   border-radius: 0 4px 4px 0;
-}
-
-/* Collapsible Achievements Drawer */
-.achievements-drawer {
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  background: var(--bg-weekly);
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  max-height: 33px; /* Collapsed state showing only header */
-}
-
-.achievements-drawer.active {
-  max-height: 250px; /* Expanded state */
-  background: var(--bg-card);
-  border-color: rgba(99, 102, 241, 0.2);
-  box-shadow: 0 4px 12px var(--shadow-color);
-}
-
-.achievements-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  cursor: pointer;
-  user-select: none;
-  background: rgba(99, 102, 241, 0.02);
-  transition: background 0.2s ease;
-}
-
-.achievements-header:hover {
-  background: rgba(99, 102, 241, 0.05);
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.header-emoji {
-  font-size: 13px;
-}
-
-.header-lbl {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.chevron-icon {
-  width: 14px;
-  height: 14px;
-  color: var(--text-secondary);
-  transition: transform 0.3s ease;
-}
-
-.achievements-drawer.active .chevron-icon {
-  transform: rotate(180deg);
-  color: var(--color-primary);
-}
-
-.achievements-content {
-  display: flex;
-  padding: 10px 12px;
-  gap: 12px;
-  border-top: 1px solid var(--border-color);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.achievements-drawer.active .achievements-content {
-  opacity: 1;
-}
-
-.achievement-column {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.column-title {
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  letter-spacing: 0.5px;
-  margin-bottom: 2px;
-}
-
-.achievement-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--text-secondary);
-  transition: all 0.2s ease;
-  opacity: 0.4;
-}
-
-.achievement-item .ach-check {
-  font-weight: bold;
-  font-size: 12px;
-  color: var(--text-secondary);
-  width: 14px;
-  text-align: center;
-}
-
-.achievement-item.unlocked {
-  color: var(--text-primary);
-  opacity: 1;
-}
-
-/* Specific streak unlock glows */
-.achievement-column:first-of-type .achievement-item.unlocked .ach-check {
-  color: var(--color-streak);
-  text-shadow: 0 0 4px rgba(251, 146, 60, 0.4);
-}
-
-/* Specific solved unlock glows */
-.achievement-column:last-of-type .achievement-item.unlocked .ach-check {
-  color: var(--color-success);
-  text-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
 }

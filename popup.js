@@ -119,7 +119,7 @@ function updateInspectorCard(dateStr) {
       hintToggleBtn.textContent = 'Need a Hint?';
     }
 
-    if (challenge.hints && challenge.hints.length > 0) {
+    if (!isCompleted && challenge.hints && challenge.hints.length > 0) {
       if (hintContainer) hintContainer.style.display = 'block';
       if (hintTextEl) hintTextEl.textContent = challenge.hints[0];
       if (hintToggleBtn) {
@@ -253,11 +253,6 @@ function renderWeeklyTracker() {
       dayDot.title = formatFriendlyDate(dateStr);
     }
 
-    // Hover events for previewing
-    dayDot.addEventListener('mouseenter', () => {
-      updateInspectorCard(dateStr);
-    });
-
     // Click events to lock selection
     dayDot.addEventListener('click', () => {
       selectedDateStr = dateStr;
@@ -332,52 +327,38 @@ function initMacDockEffect() {
       dot.style.transform = '';
       dot.style.zIndex = '';
     });
-    // Restore the inspector card preview back to the locked selection
-    updateInspectorCard(selectedDateStr);
   });
 }
 
-// Check and update milestones / achievements
-function checkAchievements(streak, totalSolved) {
-  const streakMilestones = [
-    { limit: 3, id: 'ach-streak-3' },
-    { limit: 7, id: 'ach-streak-7' },
-    { limit: 15, id: 'ach-streak-15' },
-    { limit: 30, id: 'ach-streak-30' }
-  ];
+// Calculate max consecutive streak from completed dates
+function getMaxStreak(completedDates) {
+  if (!completedDates || completedDates.length === 0) return 0;
+  
+  // Sort dates chronologically
+  const sorted = [...completedDates].sort();
+  let maxStreak = 0;
+  let currentStreak = 0;
+  let prevDate = null;
 
-  const solvedMilestones = [
-    { limit: 10, id: 'ach-solved-10' },
-    { limit: 50, id: 'ach-solved-50' },
-    { limit: 100, id: 'ach-solved-100' },
-    { limit: 250, id: 'ach-solved-250' }
-  ];
-
-  streakMilestones.forEach(m => {
-    const el = document.getElementById(m.id);
-    if (!el) return;
-    const checkEl = el.querySelector('.ach-check');
-    if (streak >= m.limit) {
-      el.classList.add('unlocked');
-      if (checkEl) checkEl.textContent = '★';
+  for (const dateStr of sorted) {
+    const currentDate = new Date(dateStr + 'T00:00:00');
+    if (!prevDate) {
+      currentStreak = 1;
     } else {
-      el.classList.remove('unlocked');
-      if (checkEl) checkEl.textContent = '○';
+      const diffTime = currentDate - prevDate;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays === 1) {
+        currentStreak++;
+      } else if (diffDays > 1) {
+        if (currentStreak > maxStreak) {
+          maxStreak = currentStreak;
+        }
+        currentStreak = 1;
+      }
     }
-  });
-
-  solvedMilestones.forEach(m => {
-    const el = document.getElementById(m.id);
-    if (!el) return;
-    const checkEl = el.querySelector('.ach-check');
-    if (totalSolved >= m.limit) {
-      el.classList.add('unlocked');
-      if (checkEl) checkEl.textContent = '✓';
-    } else {
-      el.classList.remove('unlocked');
-      if (checkEl) checkEl.textContent = '○';
-    }
-  });
+    prevDate = currentDate;
+  }
+  return Math.max(maxStreak, currentStreak);
 }
 
 // Render overall dashboard
@@ -403,6 +384,16 @@ function renderDashboard(data) {
     streakContainer.style.opacity = '0.6';
   }
 
+  // Update Streak Stats Badge Tooltip details
+  const currentStreakEl = document.getElementById('streak-current');
+  const maxStreakEl = document.getElementById('streak-max');
+  const totalDaysEl = document.getElementById('streak-total-days');
+
+  const maxStreak = getMaxStreak(localCompletedDates);
+  if (currentStreakEl) currentStreakEl.textContent = localStreak;
+  if (maxStreakEl) maxStreakEl.textContent = maxStreak;
+  if (totalDaysEl) totalDaysEl.textContent = localCompletedDates.length;
+
   // Update Solved Stats Badge and Tooltip
   const solvedStats = data.solvedStats;
   const solvedCountEl = document.getElementById('solved-count');
@@ -415,9 +406,6 @@ function renderDashboard(data) {
   if (solvedEasyEl) solvedEasyEl.textContent = solvedStats ? (solvedStats.easy || 0) : 0;
   if (solvedMediumEl) solvedMediumEl.textContent = solvedStats ? (solvedStats.medium || 0) : 0;
   if (solvedHardEl) solvedHardEl.textContent = solvedStats ? (solvedStats.hard || 0) : 0;
-
-  // Update achievements milestones
-  checkAchievements(localStreak, totalSolved);
 
   // Update Timeline and Card
   renderWeeklyTracker();
@@ -463,14 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
   startCountdown(); // Initialize footer countdown clock
   loadDashboardData(false);
 
-  // Achievements Drawer toggle behavior
-  const achDrawer = document.getElementById('achievements-drawer');
-  const achHeader = document.getElementById('achievements-header');
-  if (achHeader && achDrawer) {
-    achHeader.addEventListener('click', () => {
-      achDrawer.classList.toggle('active');
-    });
-  }
+
 
   // Refresh Button click behavior
   const refreshBtn = document.getElementById('refresh-btn');
