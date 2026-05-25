@@ -1,0 +1,468 @@
+/* LeetCode Tracker Popup Stylesheet - Refined Compact 3-Color Design */
+
+:root {
+  /* Common 3 Accent Colors */
+  --color-primary: #6366f1;   /* Indigo - Brand Accent & Action buttons */
+  --color-success: #10b981;   /* Emerald - Solved / Completed Status */
+  --color-streak: #fb923c;    /* Orange - Streak Fire */
+  
+  --transition-speed: 0.2s;
+}
+
+.theme-dark {
+  --bg-main: #0a0d14;
+  --bg-card: linear-gradient(135deg, #121722 0%, #0b0d15 100%);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-primary: #e5e7eb;
+  --text-secondary: #9ca3af;
+  
+  --bg-weekly: rgba(255, 255, 255, 0.02);
+  --bg-dot: rgba(255, 255, 255, 0.03);
+  --border-dot: rgba(255, 255, 255, 0.12);
+  --hover-card-border: rgba(255, 255, 255, 0.15);
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --shadow-glow: rgba(99, 102, 241, 0.06);
+}
+
+.theme-light {
+  --bg-main: #f8fafc;
+  --bg-card: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+  --border-color: rgba(15, 23, 42, 0.06);
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  
+  --bg-weekly: rgba(15, 23, 42, 0.01);
+  --bg-dot: rgba(15, 23, 42, 0.02);
+  --border-dot: rgba(15, 23, 42, 0.1);
+  --hover-card-border: rgba(99, 102, 241, 0.15);
+  --shadow-color: rgba(15, 23, 42, 0.04);
+  --shadow-glow: rgba(99, 102, 241, 0.03);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 310px; /* Reduced from 360px */
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: 'Outfit', 'Inter', sans-serif;
+  overflow: hidden;
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+}
+
+.popup-container {
+  padding: 14px; /* Reduced from 20px */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+  transition: border-color var(--transition-speed) ease;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.logo-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--color-primary);
+}
+
+.logo-title {
+  font-size: 15px; /* Reduced from 18px */
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.logo-title span {
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-left: 2px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-speed) ease;
+}
+
+.theme-toggle-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+  background-color: var(--bg-dot);
+}
+
+.theme-toggle-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Dynamic display of SVG icons based on body class */
+.theme-dark .theme-toggle-btn .light-icon {
+  display: block;
+}
+.theme-dark .theme-toggle-btn .dark-icon {
+  display: none;
+}
+.theme-light .theme-toggle-btn .light-icon {
+  display: none;
+}
+.theme-light .theme-toggle-btn .dark-icon {
+  display: block;
+}
+
+.streak-badge {
+  background: rgba(251, 146, 60, 0.06);
+  border: 1px solid rgba(251, 146, 60, 0.15);
+  border-radius: 50px;
+  padding: 3px 8px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: all var(--transition-speed) ease;
+}
+
+.streak-badge:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 8px rgba(251, 146, 60, 0.1);
+}
+
+.streak-emoji {
+  font-size: 11px;
+  animation: float-fire 1.5s infinite alternate ease-in-out;
+}
+
+.streak-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-streak);
+}
+
+/* Dynamic Inspector Label */
+.inspector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.inspector-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  letter-spacing: 0.5px;
+}
+
+/* Challenge Card */
+.challenge-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px; /* Reduced from 18px */
+  padding: 14px; /* Reduced from 20px */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  box-shadow: 0 4px 20px var(--shadow-color), 0 0 8px var(--shadow-glow);
+  transition: all var(--transition-speed) ease;
+}
+
+.challenge-card:hover {
+  border-color: var(--hover-card-border);
+}
+
+.challenge-card.completed {
+  border-color: rgba(16, 185, 129, 0.2);
+  box-shadow: 0 4px 20px var(--shadow-color), 0 0 10px rgba(16, 185, 129, 0.05);
+}
+
+.card-status-indicator {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
+.checkbox-ring {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-dot);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-speed) ease;
+  color: transparent;
+}
+
+.challenge-card.completed .checkbox-ring {
+  border-color: var(--color-success);
+  background-color: var(--color-success);
+  color: var(--bg-main);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.25);
+}
+
+.check-icon {
+  width: 10px;
+  height: 10px;
+}
+
+.card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 85%;
+}
+
+.question-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.difficulty-badge {
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1.5px 6px;
+  border-radius: 3px;
+}
+
+.difficulty-badge.easy {
+  color: var(--color-success);
+  background-color: rgba(16, 185, 129, 0.08);
+}
+
+.difficulty-badge.medium {
+  color: var(--color-streak);
+  background-color: rgba(251, 146, 60, 0.08);
+}
+
+.difficulty-badge.hard {
+  color: var(--color-primary);
+  background-color: rgba(99, 102, 241, 0.08);
+}
+
+.date-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.question-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 37px; /* Reserve height for exactly 2 lines of text to prevent layout shifts */
+}
+
+.solve-btn {
+  width: 100%;
+  padding: 8px 0;
+  border-radius: 8px;
+  border: 1px solid transparent; /* Keeps sizing box constant across states */
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+.solve-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(99, 102, 241, 0.25);
+}
+
+.solve-btn:active {
+  transform: translateY(0);
+}
+
+.challenge-card.completed .solve-btn {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  color: var(--color-success);
+  pointer-events: none;
+}
+
+/* History Section */
+.history-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.section-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.8px;
+}
+
+/* Redesigned into wrapping flexbox to support any number of monthly items smoothly */
+.weekly-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; /* Increased gap for hover spacing */
+  background: var(--bg-weekly);
+  border: 1px solid var(--border-color);
+  padding: 16px 8px 8px 8px; /* Added extra top padding (16px) for hover magnification lift */
+  border-radius: 10px;
+  transition: all var(--transition-speed) ease;
+}
+
+.day-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 28px; /* Fixed item size prevents layout shifting on hover */
+  position: relative;
+}
+
+.day-lbl {
+  font-size: 8.5px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  pointer-events: none; /* Make label transparent to mouse interactions */
+}
+
+.day-dot {
+  width: 20px; /* Reduced from 22px */
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  background-color: var(--bg-dot);
+  border: 1.5px solid var(--border-dot); /* Keep solid, only change colors to avoid border-style shifting glitches */
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  /* Custom fast transform transition to mimic springy macOS Dock */
+  transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, color var(--transition-speed) ease, box-shadow var(--transition-speed) ease, transform 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Smooth and glitch-free hover transition */
+.day-dot:hover {
+  transform: translateY(-1px);
+  border-color: var(--color-primary);
+  color: var(--text-primary);
+  box-shadow: 0 0 6px rgba(99, 102, 241, 0.2);
+}
+
+.day-dot.completed {
+  background-color: rgba(16, 185, 129, 0.06);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.day-dot.missed {
+  background-color: transparent;
+  border-color: var(--border-dot);
+}
+
+.day-dot.today {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+}
+
+.day-dot.selected {
+  border-color: var(--color-primary);
+  background-color: rgba(99, 102, 241, 0.08);
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.day-dot.selected.completed {
+  border-color: var(--color-primary);
+  background-color: rgba(16, 185, 129, 0.06);
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+  padding-top: 8px;
+  margin-top: 2px;
+  transition: border-color var(--transition-speed) ease;
+}
+
+.footer p {
+  font-size: 10px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.refresh-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refresh-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-dot);
+}
+
+.refresh-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Animations */
+@keyframes float-fire {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    transform: translateY(-1.5px) scale(1.05);
+  }
+}

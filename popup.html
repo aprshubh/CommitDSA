@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeetCode Tracker Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body class="theme-light"> <!-- default class, toggleable to theme-dark -->
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-area">
+        <span class="logo-dot"></span>
+        <h1 class="logo-title">LeetCode<span>Daily</span></h1>
+      </div>
+      
+      <div class="header-actions">
+        <!-- Theme Toggle Switch Button -->
+        <button class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Theme">
+          <svg class="dark-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg class="light-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+
+        <!-- Streak Fire Counter -->
+        <div class="streak-badge" id="streak-container">
+          <span class="streak-emoji">🔥</span>
+          <span class="streak-count" id="streak-count">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Section Label for Dynamic Inspector -->
+      <div class="inspector-header">
+        <span class="inspector-label" id="inspector-label">Today's Challenge</span>
+      </div>
+
+      <!-- Challenge Card (Dynamic Inspector) -->
+      <div class="challenge-card" id="challenge-card">
+        <div class="card-status-indicator" id="status-indicator">
+          <div class="checkbox-ring">
+            <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="card-details">
+          <div class="question-meta">
+            <span class="difficulty-badge" id="question-difficulty">Easy</span>
+            <span class="date-label" id="question-date">May 26, 2026</span>
+          </div>
+          <h2 class="question-title" id="question-title">Loading today's challenge...</h2>
+        </div>
+
+        <button class="solve-btn" id="solve-btn">Solve Challenge</button>
+      </div>
+
+      <!-- Weekly History Row -->
+      <section class="history-section">
+        <h3 class="section-title">Weekly Tracker</h3>
+        <div class="weekly-row" id="weekly-row">
+          <!-- 7 day items injected dynamically -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p id="motivational-quote">Fuel your streak, keep coding!</p>
+      <button class="refresh-btn" id="refresh-btn" title="Refresh challenge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+        </svg>
+      </button>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
