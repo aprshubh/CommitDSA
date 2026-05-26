@@ -221,6 +221,9 @@ async function fetchAndSyncChallenges() {
   }
   await chrome.storage.local.set(syncData);
 
+  // Update Toolbar Badge
+  updateExtensionBadge(completedDates, todayQuestion || storageData.dailyQuestion);
+
   console.log(`[LeetCode Tracker] Synced successfully. Streak: ${newStreak}`);
   return {
     dailyQuestion: todayQuestion || storageData.dailyQuestion,
@@ -235,6 +238,23 @@ async function fetchDailyQuestion() {
   const synced = await fetchAndSyncChallenges();
   return synced.dailyQuestion;
 }
+
+// Update Chrome extension toolbar badge (orange '!' for incomplete, green '✓' for completed)
+function updateExtensionBadge(completedDates, dailyQuestion) {
+  if (!dailyQuestion) {
+    chrome.action.setBadgeText({ text: '' });
+    return;
+  }
+  const isCompleted = completedDates.includes(dailyQuestion.date);
+  if (isCompleted) {
+    chrome.action.setBadgeText({ text: '✓' });
+    chrome.action.setBadgeBackgroundColor({ color: '#10b981' }); // Emerald Green
+  } else {
+    chrome.action.setBadgeText({ text: '!' });
+    chrome.action.setBadgeBackgroundColor({ color: '#fb923c' }); // Orange
+  }
+}
+
 
 // 4. Streak and History Calculations
 function calculateStreak(completedDates, startingDateStr) {
@@ -382,6 +402,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           
           // Re-fetch user solved statistics as total solved count has increased!
           fetchUserSolvedStats();
+          
+          // Update Toolbar Badge
+          updateExtensionBadge(completedDates, dailyQuestion);
           
           sendResponse({
             isDailyCompleted: true,

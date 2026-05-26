@@ -42,17 +42,22 @@
           <!-- Premium Hover Tooltip -->
           <div class="solved-tooltip" id="solved-tooltip">
             <div class="tooltip-title">Solved Problems</div>
-            <div class="tooltip-row">
-              <span class="lbl easy">Easy</span>
-              <span class="val" id="solved-easy">0</span>
+            <div id="solved-stats-rows">
+              <div class="tooltip-row">
+                <span class="lbl easy">Easy</span>
+                <span class="val" id="solved-easy">0</span>
+              </div>
+              <div class="tooltip-row">
+                <span class="lbl medium">Medium</span>
+                <span class="val" id="solved-medium">0</span>
+              </div>
+              <div class="tooltip-row">
+                <span class="lbl hard">Hard</span>
+                <span class="val" id="solved-hard">0</span>
+              </div>
             </div>
-            <div class="tooltip-row">
-              <span class="lbl medium">Medium</span>
-              <span class="val" id="solved-medium">0</span>
-            </div>
-            <div class="tooltip-row">
-              <span class="lbl hard">Hard</span>
-              <span class="val" id="solved-hard">0</span>
+            <div class="login-alert" id="solved-login-alert" style="display: none;">
+              Login to leetcode.com to sync stats
             </div>
           </div>
         </div>

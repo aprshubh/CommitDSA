@@ -400,12 +400,23 @@ function renderDashboard(data) {
   const solvedEasyEl = document.getElementById('solved-easy');
   const solvedMediumEl = document.getElementById('solved-medium');
   const solvedHardEl = document.getElementById('solved-hard');
+  const solvedRowsEl = document.getElementById('solved-stats-rows');
+  const solvedAlertEl = document.getElementById('solved-login-alert');
   
-  const totalSolved = solvedStats ? (solvedStats.total || 0) : 0;
-  if (solvedCountEl) solvedCountEl.textContent = totalSolved;
-  if (solvedEasyEl) solvedEasyEl.textContent = solvedStats ? (solvedStats.easy || 0) : 0;
-  if (solvedMediumEl) solvedMediumEl.textContent = solvedStats ? (solvedStats.medium || 0) : 0;
-  if (solvedHardEl) solvedHardEl.textContent = solvedStats ? (solvedStats.hard || 0) : 0;
+  if (solvedCountEl) {
+    solvedCountEl.textContent = solvedStats ? (solvedStats.total || 0) : '--';
+  }
+
+  if (solvedStats) {
+    if (solvedRowsEl) solvedRowsEl.style.display = 'block';
+    if (solvedAlertEl) solvedAlertEl.style.display = 'none';
+    if (solvedEasyEl) solvedEasyEl.textContent = solvedStats.easy || 0;
+    if (solvedMediumEl) solvedMediumEl.textContent = solvedStats.medium || 0;
+    if (solvedHardEl) solvedHardEl.textContent = solvedStats.hard || 0;
+  } else {
+    if (solvedRowsEl) solvedRowsEl.style.display = 'none';
+    if (solvedAlertEl) solvedAlertEl.style.display = 'block';
+  }
 
   // Update Timeline and Card
   renderWeeklyTracker();
