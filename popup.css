@@ -587,3 +587,30 @@ body {
   text-align: center;
   padding: 4px 0;
 }
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  margin-bottom: 2px;
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+
+.footer-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition-speed) ease;
+}
+
+.footer-link:hover {
+  color: var(--color-primary);
+}
+
+.link-separator {
+  color: var(--border-color);
+  user-select: none;
+}

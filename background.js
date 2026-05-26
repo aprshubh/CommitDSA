@@ -14,6 +14,52 @@ const REMINDER_TIMES = [
   { h: 24, m: 0 } // 12:00 AM midnight (00:00 next day)
 ];
 
+// Google Analytics 4 (GA4) Measurement Protocol Config
+const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX'; // Replace with GA4 Measurement ID
+const GA_API_SECRET = 'XXXXXXXXXXXXXXXXXXXXXX'; // Replace with GA4 API Secret
+
+async function getOrCreateClientId() {
+  const result = await chrome.storage.local.get(['clientId']);
+  if (result.clientId) {
+    return result.clientId;
+  }
+  // Generate random UUID
+  const clientId = self.crypto.randomUUID();
+  await chrome.storage.local.set({ clientId });
+  return clientId;
+}
+
+async function trackEvent(name, params = {}) {
+  // If credentials are placeholders, skip tracking to prevent noise
+  if (GA_MEASUREMENT_ID === 'G-XXXXXXXXXX' || GA_API_SECRET === 'XXXXXXXXXXXXXXXXXXXXXX') {
+    return;
+  }
+  
+  try {
+    const clientId = await getOrCreateClientId();
+    const url = `https://www.google-analytics.com/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_API_SECRET}`;
+    
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        events: [{
+          name: name,
+          params: {
+            ...params,
+            engagement_time_msec: '100'
+          }
+        }]
+      })
+    });
+  } catch (error) {
+    console.warn('[LeetCode Tracker] Analytics failed:', error);
+  }
+}
+
 // Helper to get formatted local date (YYYY-MM-DD)
 function getLocalDateString(date = new Date()) {
   const yyyy = date.getFullYear();
@@ -427,6 +473,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   
   if (request.type === 'GET_DASHBOARD_DATA' || request.type === 'FORCE_REFRESH_DAILY') {
+    trackEvent('popup_open', { action_type: request.type });
     Promise.all([
       fetchAndSyncChallenges(),
       fetchUserSolvedStats()
@@ -456,6 +503,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // 9. Initialize extension
 chrome.runtime.onInstalled.addListener((details) => {
   console.log('[LeetCode Tracker] Extension installed.');
+  
+  if (details.reason === 'install') {
+    chrome.tabs.create({ url: 'welcome.html' });
+    trackEvent('extension_install');
+  } else if (details.reason === 'update') {
+    trackEvent('extension_update', { previous_version: details.previousVersion });
+  }
   
   // Set up storage defaults
   chrome.storage.local.get(['completedDates', 'streak'], (data) => {
