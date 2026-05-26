@@ -26,11 +26,11 @@
           }, '*');
         }
       } catch (e) {
-        console.warn('[LeetCode Tracker] Error intercepting submission details:', e);
+        console.warn('[LeetSync] Error intercepting submission details:', e);
       }
     }
     return response;
   };
   
-  console.log('[LeetCode Tracker] API interceptor injected successfully.');
+  console.log('[LeetSync] API interceptor injected successfully.');
 })();

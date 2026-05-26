@@ -1,4 +1,4 @@
-// LeetCode Daily Challenge Tracker - Service Worker
+// LeetSync - Service Worker
 
 const LEETCODE_GRAPHQL_URL = 'https://leetcode.com/graphql';
 
@@ -61,7 +61,7 @@ async function fetchMonthChallenges(year, month) {
     const result = await response.json();
     return result.data?.dailyCodingChallengeV2?.challenges || [];
   } catch (error) {
-    console.warn(`[LeetCode Tracker] Error fetching month ${year}-${month}:`, error);
+    console.warn(`[LeetSync] Error fetching month ${year}-${month}:`, error);
     return [];
   }
 }
@@ -141,11 +141,11 @@ async function fetchUserSolvedStats() {
       };
       
       await chrome.storage.local.set({ solvedStats });
-      console.log('[LeetCode Tracker] Solved stats synced:', solvedStats);
+      console.log('[LeetSync] Solved stats synced:', solvedStats);
       return solvedStats;
     }
   } catch (error) {
-    console.warn('[LeetCode Tracker] Error fetching user solved stats:', error);
+    console.warn('[LeetSync] Error fetching user solved stats:', error);
   }
   return null;
 }
@@ -226,7 +226,7 @@ async function fetchAndSyncChallenges() {
   // Update Toolbar Badge
   updateExtensionBadge(completedDates, todayQuestion || storageData.dailyQuestion);
 
-  console.log(`[LeetCode Tracker] Synced successfully. Streak: ${newStreak}`);
+  console.log(`[LeetSync] Synced successfully. Streak: ${newStreak}`);
   return {
     dailyQuestion: todayQuestion || storageData.dailyQuestion,
     completedDates,
@@ -321,7 +321,7 @@ function scheduleNextReminder() {
     const nextTime = getNextReminderTime();
     const delay = nextTime.getTime() - Date.now();
     chrome.alarms.create('scheduled_reminder', { when: Date.now() + delay });
-    console.log('[LeetCode Tracker] Scheduled next reminder alarm for:', nextTime.toString());
+    console.log('[LeetSync] Scheduled next reminder alarm for:', nextTime.toString());
   });
 }
 
@@ -331,7 +331,7 @@ function triggerReminderNotification() {
     const completedDates = data.completedDates || [];
     
     if (completedDates.includes(todayStr)) {
-      console.log('[LeetCode Tracker] Daily challenge already done. No notification needed.');
+      console.log('[LeetSync] Daily challenge already done. No notification needed.');
       return;
     }
 
@@ -340,7 +340,7 @@ function triggerReminderNotification() {
     chrome.notifications.create('leetcode_reminder_notification', {
       type: 'basic',
       iconUrl: 'icon.png',
-      title: 'LeetCode Daily Challenge Alert!',
+      title: 'LeetSync Daily Challenge Alert!',
       message: `Your streak is burning! Today's question "${title}" is waiting. Click to solve it now.`,
       requireInteraction: true,
       priority: 2
@@ -350,7 +350,7 @@ function triggerReminderNotification() {
 
 // 6. Listen for alarms
 chrome.alarms.onAlarm.addListener((alarm) => {
-  console.log('[LeetCode Tracker] Alarm fired:', alarm.name);
+  console.log('[LeetSync] Alarm fired:', alarm.name);
   
   if (alarm.name === 'scheduled_reminder') {
     triggerReminderNotification();
@@ -441,7 +441,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           solvedStats: solvedStats || null
         });
       }).catch((err) => {
-        console.warn('[LeetCode Tracker] Sync failed in message listener:', err);
+        console.warn('[LeetSync] Sync failed in message listener:', err);
         // Fallback response from cache
         chrome.storage.local.get(['dailyQuestion', 'completedDates', 'streak', 'challengesMap', 'solvedStats'], (cache) => {
           sendResponse({
@@ -463,7 +463,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const isCacheValid = cache.lastSyncTime && (Date.now() - cache.lastSyncTime < CACHE_DURATION);
         
         if (isCacheValid && cache.challengesMap) {
-          console.log('[LeetCode Tracker] Using cached data (Rate Limit Protection)');
+          console.log('[LeetSync] Using cached data (Rate Limit Protection)');
           sendResponse({
             dailyQuestion: cache.dailyQuestion || null,
             completedDates: cache.completedDates || [],
@@ -483,7 +483,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // 9. Initialize extension
 chrome.runtime.onInstalled.addListener((details) => {
-  console.log('[LeetCode Tracker] Extension installed.');
+  console.log('[LeetSync] Extension installed.');
   
   if (details.reason === 'install') {
     chrome.tabs.create({ url: 'welcome.html' });

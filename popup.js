@@ -1,4 +1,4 @@
-// LeetCode Daily Challenge Tracker - Refined Popup Script
+// LeetSync - Refined Popup Script
 
 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -412,7 +412,7 @@ function loadDashboardData(forceRefresh = false) {
   
   chrome.runtime.sendMessage({ type: actionType }, (response) => {
     if (chrome.runtime.lastError) {
-      console.warn('[LeetCode Tracker] Service worker communication failed:', chrome.runtime.lastError);
+      console.warn('[LeetSync] Service worker communication failed:', chrome.runtime.lastError);
       return;
     }
     

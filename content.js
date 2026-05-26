@@ -1,4 +1,4 @@
-// LeetCode Daily Challenge Tracker - Content Script
+// LeetSync - Content Script
 
 // 1. Inject inject.js to run in the main execution world
 const injectScript = () => {
@@ -265,7 +265,7 @@ window.addEventListener('message', (event) => {
   const { titleSlug } = event.data;
   if (!titleSlug) return;
 
-  console.log(`[LeetCode Tracker] Submission detected for: ${titleSlug}. Verifying...`);
+  console.log(`[LeetSync] Submission detected for: ${titleSlug}. Verifying...`);
 
   // Message background.js to verify if this is the daily challenge
   chrome.runtime.sendMessage({
@@ -273,15 +273,15 @@ window.addEventListener('message', (event) => {
     titleSlug: titleSlug
   }, (response) => {
     if (chrome.runtime.lastError) {
-      console.warn('[LeetCode Tracker] Background worker communication error:', chrome.runtime.lastError);
+      console.warn('[LeetSync] Background worker communication error:', chrome.runtime.lastError);
       return;
     }
 
     if (response && response.isDailyCompleted) {
-      console.log('[LeetCode Tracker] Daily challenge successfully completed! Displaying animation.');
+      console.log('[LeetSync] Daily challenge successfully completed! Displaying animation.');
       showCompletionOverlay(response.dailyData, response.streak);
     } else {
-      console.log('[LeetCode Tracker] Submission verified. Not the uncompleted daily challenge or already marked complete today.');
+      console.log('[LeetSync] Submission verified. Not the uncompleted daily challenge or already marked complete today.');
     }
   });
 });
