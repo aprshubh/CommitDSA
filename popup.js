@@ -123,7 +123,7 @@ function updateInspectorCard(dateStr) {
 // Generate the list of monthly incompleted challenges + today's challenge
 function renderWeeklyTracker() {
   const weeklyRow = document.getElementById('weekly-row');
-  weeklyRow.innerHTML = '';
+  weeklyRow.replaceChildren();
 
   // If user is not logged in, show login warning instead of dots
   if (!localSolvedStats) {
@@ -400,6 +400,14 @@ function renderDashboard(data) {
 
 // Request data from background service worker
 function loadDashboardData(forceRefresh = false) {
+  // 1. Instant Load: Render immediately from local storage for zero-lag UI
+  chrome.storage.local.get(['dailyQuestion', 'completedDates', 'streak', 'challengesMap', 'solvedStats'], (cache) => {
+    if (cache && Object.keys(cache).length > 0) {
+      renderDashboard(cache);
+    }
+  });
+
+  // 2. Background Sync: Ask service worker to fetch/verify data
   const actionType = forceRefresh ? 'FORCE_REFRESH_DAILY' : 'GET_DASHBOARD_DATA';
   
   chrome.runtime.sendMessage({ type: actionType }, (response) => {
@@ -409,6 +417,7 @@ function loadDashboardData(forceRefresh = false) {
     }
     
     if (response) {
+      // Re-render if background fetched new fresh data
       renderDashboard(response);
     }
   });
@@ -437,9 +446,6 @@ document.addEventListener('DOMContentLoaded', () => {
   startCountdown(); // Initialize footer countdown clock
   loadDashboardData(false);
 
-
-
-  // Refresh Button click behavior
   const refreshBtn = document.getElementById('refresh-btn');
   refreshBtn.addEventListener('click', () => {
     // Rotation animation

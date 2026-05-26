@@ -1,15 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "LeetCode Daily Tracker",
+  "name": "LeetSync",
   "version": "1.0.0",
   "description": "Auto-detects LeetCode daily challenge completion with stunning success animations, streak tracking, and daily reminders.",
   "permissions": [
     "storage",
     "alarms",
-    "notifications"
+    "notifications",
+    "unlimitedStorage",
+    "cookies"
   ],
   "host_permissions": [
-    "https://leetcode.com/*"
+    "https://leetcode.com/*",
+    "https://*.leetcode.com/*"
   ],
   "background": {
     "service_worker": "background.js"

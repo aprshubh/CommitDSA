@@ -128,32 +128,98 @@ const showCompletionOverlay = (dailyData, streak) => {
 
   const difficultyClass = (dailyData.difficulty || 'Easy').toLowerCase();
   
-  overlay.innerHTML += `
-    <div class="lc-tracker-card">
-      <div class="lc-tracker-checkmark-container">
-        <div class="lc-tracker-checkmark-bg"></div>
-        <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-          <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
-          <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-        </svg>
-      </div>
-      <div class="lc-tracker-badge">Daily Challenge</div>
-      <h1 class="lc-tracker-title">Accepted!</h1>
-      <p class="lc-tracker-problem">
-        <span>${dailyData.title}</span>
-        <span class="lc-tracker-difficulty ${difficultyClass}">${dailyData.difficulty}</span>
-      </p>
-      <div class="lc-tracker-divider"></div>
-      <div class="lc-tracker-streak-card">
-        <div class="lc-tracker-streak-fire">🔥</div>
-        <div class="lc-tracker-streak-text">
-          <div class="lc-tracker-streak-val">${streak} Day${streak > 1 ? 's' : ''} Streak</div>
-          <div class="lc-tracker-streak-lbl">Keep it burning!</div>
-        </div>
-      </div>
-      <button class="lc-tracker-close-btn" id="lc-tracker-close-btn">Dismiss</button>
-    </div>
-  `;
+  const card = document.createElement('div');
+  card.className = 'lc-tracker-card';
+
+  const checkmarkContainer = document.createElement('div');
+  checkmarkContainer.className = 'lc-tracker-checkmark-container';
+
+  const checkmarkBg = document.createElement('div');
+  checkmarkBg.className = 'lc-tracker-checkmark-bg';
+
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("class", "checkmark-svg");
+  svg.setAttribute("viewBox", "0 0 52 52");
+
+  const circle = document.createElementNS(svgNS, "circle");
+  circle.setAttribute("class", "checkmark-circle");
+  circle.setAttribute("cx", "26");
+  circle.setAttribute("cy", "26");
+  circle.setAttribute("r", "25");
+  circle.setAttribute("fill", "none");
+
+  const path = document.createElementNS(svgNS, "path");
+  path.setAttribute("class", "checkmark-check");
+  path.setAttribute("fill", "none");
+  path.setAttribute("d", "M14.1 27.2l7.1 7.2 16.7-16.8");
+
+  svg.appendChild(circle);
+  svg.appendChild(path);
+  checkmarkContainer.appendChild(checkmarkBg);
+  checkmarkContainer.appendChild(svg);
+
+  const badge = document.createElement('div');
+  badge.className = 'lc-tracker-badge';
+  badge.textContent = 'Daily Challenge';
+
+  const title = document.createElement('h1');
+  title.className = 'lc-tracker-title';
+  title.textContent = 'Accepted!';
+
+  const problem = document.createElement('p');
+  problem.className = 'lc-tracker-problem';
+
+  const problemTitle = document.createElement('span');
+  problemTitle.textContent = dailyData.title + " ";
+
+  const problemDifficulty = document.createElement('span');
+  problemDifficulty.className = 'lc-tracker-difficulty ' + difficultyClass;
+  problemDifficulty.textContent = dailyData.difficulty;
+
+  problem.appendChild(problemTitle);
+  problem.appendChild(problemDifficulty);
+
+  const divider = document.createElement('div');
+  divider.className = 'lc-tracker-divider';
+
+  const streakCard = document.createElement('div');
+  streakCard.className = 'lc-tracker-streak-card';
+
+  const streakFire = document.createElement('div');
+  streakFire.className = 'lc-tracker-streak-fire';
+  streakFire.textContent = '🔥';
+
+  const streakTextContainer = document.createElement('div');
+  streakTextContainer.className = 'lc-tracker-streak-text';
+
+  const streakVal = document.createElement('div');
+  streakVal.className = 'lc-tracker-streak-val';
+  streakVal.textContent = streak + ' Day' + (streak > 1 ? 's' : '') + ' Streak';
+
+  const streakLbl = document.createElement('div');
+  streakLbl.className = 'lc-tracker-streak-lbl';
+  streakLbl.textContent = 'Keep it burning!';
+
+  streakTextContainer.appendChild(streakVal);
+  streakTextContainer.appendChild(streakLbl);
+  streakCard.appendChild(streakFire);
+  streakCard.appendChild(streakTextContainer);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'lc-tracker-close-btn';
+  closeBtn.id = 'lc-tracker-close-btn';
+  closeBtn.textContent = 'Dismiss';
+
+  card.appendChild(checkmarkContainer);
+  card.appendChild(badge);
+  card.appendChild(title);
+  card.appendChild(problem);
+  card.appendChild(divider);
+  card.appendChild(streakCard);
+  card.appendChild(closeBtn);
+
+  overlay.appendChild(card);
 
   document.body.appendChild(overlay);
 

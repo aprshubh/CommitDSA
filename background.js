@@ -474,27 +474,53 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   
   if (request.type === 'GET_DASHBOARD_DATA' || request.type === 'FORCE_REFRESH_DAILY') {
     trackEvent('popup_open', { action_type: request.type });
-    Promise.all([
-      fetchAndSyncChallenges(),
-      fetchUserSolvedStats()
-    ]).then(([syncedData, solvedStats]) => {
-      sendResponse({
-        ...syncedData,
-        solvedStats: solvedStats || null
-      });
-    }).catch((err) => {
-      console.warn('[LeetCode Tracker] Sync failed in message listener:', err);
-      // Fallback response from cache
-      chrome.storage.local.get(['dailyQuestion', 'completedDates', 'streak', 'challengesMap', 'solvedStats'], (cache) => {
+
+    const fetchFreshData = () => {
+      Promise.all([
+        fetchAndSyncChallenges(),
+        fetchUserSolvedStats()
+      ]).then(([syncedData, solvedStats]) => {
+        chrome.storage.local.set({ lastSyncTime: Date.now() });
         sendResponse({
-          dailyQuestion: cache.dailyQuestion || null,
-          completedDates: cache.completedDates || [],
-          streak: cache.streak || 0,
-          challengesMap: cache.challengesMap || {},
-          solvedStats: cache.solvedStats || null
+          ...syncedData,
+          solvedStats: solvedStats || null
+        });
+      }).catch((err) => {
+        console.warn('[LeetCode Tracker] Sync failed in message listener:', err);
+        // Fallback response from cache
+        chrome.storage.local.get(['dailyQuestion', 'completedDates', 'streak', 'challengesMap', 'solvedStats'], (cache) => {
+          sendResponse({
+            dailyQuestion: cache.dailyQuestion || null,
+            completedDates: cache.completedDates || [],
+            streak: cache.streak || 0,
+            challengesMap: cache.challengesMap || {},
+            solvedStats: cache.solvedStats || null
+          });
         });
       });
-    });
+    };
+
+    if (request.type === 'FORCE_REFRESH_DAILY') {
+      fetchFreshData();
+    } else {
+      chrome.storage.local.get(['lastSyncTime', 'dailyQuestion', 'completedDates', 'streak', 'challengesMap', 'solvedStats'], (cache) => {
+        const CACHE_DURATION = 60 * 60 * 1000; // 1 hour caching to prevent rate limiting
+        const isCacheValid = cache.lastSyncTime && (Date.now() - cache.lastSyncTime < CACHE_DURATION);
+        
+        if (isCacheValid && cache.challengesMap) {
+          console.log('[LeetCode Tracker] Using cached data (Rate Limit Protection)');
+          sendResponse({
+            dailyQuestion: cache.dailyQuestion || null,
+            completedDates: cache.completedDates || [],
+            streak: cache.streak || 0,
+            challengesMap: cache.challengesMap || {},
+            solvedStats: cache.solvedStats || null
+          });
+        } else {
+          fetchFreshData();
+        }
+      });
+    }
     
     return true; // Keep message channel open for async response
   }
