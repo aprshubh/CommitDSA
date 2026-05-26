@@ -577,48 +577,7 @@ body {
 }
 
 /* Collapsible Hints Container */
-.hint-container {
-  margin-top: 4px;
-  width: 100%;
-}
 
-.hint-toggle-btn {
-  width: 100%;
-  background: transparent;
-  border: 1px dashed var(--border-dot);
-  color: var(--text-secondary);
-  padding: 6px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-speed) ease;
-  text-align: center;
-}
-
-.hint-toggle-btn:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: rgba(99, 102, 241, 0.03);
-}
-
-.hint-text-wrapper {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hint-text {
-  font-size: 11px;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  padding: 8px 6px 4px 6px;
-  font-style: italic;
-  border-left: 2px solid var(--color-primary);
-  margin-top: 4px;
-  background: rgba(99, 102, 241, 0.02);
-  border-radius: 0 4px 4px 0;
-}
 
 .login-alert {
   font-size: 10px;

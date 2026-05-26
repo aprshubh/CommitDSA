@@ -7,6 +7,7 @@ let localCompletedDates = [];
 let localChallengesMap = {};
 let localStreak = 0;
 let localDailyQuestion = null;
+let localSolvedStats = null;
 let selectedDateStr = ''; // Whichever day is clicked/locked
 let todayDateStr = '';
 
@@ -104,42 +105,6 @@ function updateInspectorCard(dateStr) {
         chrome.tabs.create({ url });
       };
     }
-
-    // Handle Hints collapsible container
-    const hintContainer = document.getElementById('hint-container');
-    const hintToggleBtn = document.getElementById('hint-toggle-btn');
-    const hintTextWrapper = document.getElementById('hint-text-wrapper');
-    const hintTextEl = document.getElementById('hint-text');
-
-    if (hintTextWrapper) {
-      hintTextWrapper.classList.remove('expanded');
-      hintTextWrapper.style.maxHeight = '0';
-    }
-    if (hintToggleBtn) {
-      hintToggleBtn.textContent = 'Need a Hint?';
-    }
-
-    if (!isCompleted && challenge.hints && challenge.hints.length > 0) {
-      if (hintContainer) hintContainer.style.display = 'block';
-      if (hintTextEl) hintTextEl.textContent = challenge.hints[0];
-      if (hintToggleBtn) {
-        hintToggleBtn.onclick = (e) => {
-          e.preventDefault();
-          const isExpanded = hintTextWrapper.classList.contains('expanded');
-          if (isExpanded) {
-            hintTextWrapper.classList.remove('expanded');
-            hintTextWrapper.style.maxHeight = '0';
-            hintToggleBtn.textContent = 'Need a Hint?';
-          } else {
-            hintTextWrapper.classList.add('expanded');
-            hintTextWrapper.style.maxHeight = (hintTextEl.scrollHeight + 16) + 'px';
-            hintToggleBtn.textContent = 'Hide Hint';
-          }
-        };
-      }
-    } else {
-      if (hintContainer) hintContainer.style.display = 'none';
-    }
   } else {
     titleEl.textContent = 'Challenge details not synced.';
     diffEl.textContent = 'Unknown';
@@ -150,9 +115,6 @@ function updateInspectorCard(dateStr) {
     solveBtn.onclick = () => {
       chrome.tabs.create({ url: 'https://leetcode.com/problemset/all/' });
     };
-
-    const hintContainer = document.getElementById('hint-container');
-    if (hintContainer) hintContainer.style.display = 'none';
   }
 
   // Removed motivational quote update to favor countdown timer
@@ -162,6 +124,17 @@ function updateInspectorCard(dateStr) {
 function renderWeeklyTracker() {
   const weeklyRow = document.getElementById('weekly-row');
   weeklyRow.innerHTML = '';
+
+  // If user is not logged in, show login warning instead of dots
+  if (!localSolvedStats) {
+    const loginPrompt = document.createElement('div');
+    loginPrompt.className = 'login-alert';
+    loginPrompt.style.width = '100%';
+    loginPrompt.style.textAlign = 'center';
+    loginPrompt.textContent = 'Login to leetcode.com to see backlog';
+    weeklyRow.appendChild(loginPrompt);
+    return;
+  }
 
   const todayStr = todayDateStr;
   
@@ -185,8 +158,9 @@ function renderWeeklyTracker() {
   // 2. Filter out today to get past dates
   const pastDates = monthDates.filter(date => date !== todayStr);
 
-  // 3. Unsolved past challenges (which now automatically includes yesterday if it was unsolved!)
+  // 3. Unsolved past challenges, capped at max 3 previous problems
   const unsolvedPast = pastDates.filter(date => !localCompletedDates.includes(date));
+  const limitedUnsolvedPast = unsolvedPast.slice(-3);
 
   // 4. Solved past challenges (which now automatically includes yesterday if it was completed!)
   const solvedPast = pastDates.filter(date => localCompletedDates.includes(date));
@@ -195,10 +169,10 @@ function renderWeeklyTracker() {
   const lastSolvedStr = solvedPast.length > 0 ? solvedPast[solvedPast.length - 1] : null;
 
   // Assemble display list:
-  // - First, all unsolved past dates
+  // - First, all unsolved past dates (limited to 3)
   // - Next, the last solved challenge (if exists)
   // - Finally, today's challenge (current day, labeled TD)
-  const displayDates = [...unsolvedPast];
+  const displayDates = [...limitedUnsolvedPast];
   
   if (lastSolvedStr && !displayDates.includes(lastSolvedStr)) {
     displayDates.push(lastSolvedStr);
@@ -367,6 +341,7 @@ function renderDashboard(data) {
   localChallengesMap = data.challengesMap || {};
   localStreak = data.streak || 0;
   localDailyQuestion = data.dailyQuestion;
+  localSolvedStats = data.solvedStats;
 
   // Align todayDateStr with LeetCode's active date, fallback to system date if empty
   todayDateStr = localDailyQuestion ? localDailyQuestion.date : getLocalDateString();
