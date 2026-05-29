@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to CommitDSA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="welcome.css">
+</head>
+<body>
+  <div class="welcome-container">
+    <div class="card fade-in">
+      <div class="logo-area">
+        <span class="logo-dot"></span>
+        <h1 class="logo-title">Commit<span>DSA</span></h1>
+      </div>
+      <h2 class="title">Successfully Installed!</h2>
+      <p class="subtitle">Your ultimate companion to automatically sync your DSA solutions to GitHub.</p>
+
+      <div style="background-color: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b; padding: 12px 16px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; font-weight: 500; text-align: center;">
+        ✨ <strong>Note:</strong> The "Auto Sync" feature is coming in our next major update! Currently, please use the Manual Sync popup when you submit a solution.
+      </div>
+
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-badge">1</div>
+          <div class="step-text">
+            <h3>Pin the Extension</h3>
+            <p>Click the Puzzle piece icon in your toolbar, find <strong>CommitDSA</strong>, and click the Pin icon to pin it.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">2</div>
+          <div class="step-text">
+            <h3>Login to Coding Platforms</h3>
+            <p>Make sure you are signed in on <a href="https://leetcode.com" target="_blank" rel="noopener noreferrer">leetcode.com</a> and <a href="https://practice.geeksforgeeks.org/" target="_blank" rel="noopener noreferrer">geeksforgeeks.org</a> so we can capture your accepted solutions.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-badge">3</div>
+          <div class="step-text">
+            <h3>Start Coding!</h3>
+            <p>Open the extension popup to view your new <strong>Dashboard</strong>! You can track your <strong>LeetCode Global Rank</strong> and <strong>GeeksforGeeks Score</strong>, switch between platforms seamlessly, and configure GitHub syncing in Settings.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GitHub Setup Guide Divider -->
+      <div class="divider"></div>
+
+      <!-- GitHub Integration Guide -->
+      <div class="guide-section">
+        <h2 class="guide-title">🚀 GitHub & API Configuration Guide</h2>
+        <p class="guide-subtitle">Follow these quick links to configure settings inside the extension popup.</p>
+        
+        <div class="guide-steps-container">
+          <!-- Step 1: GitHub PAT -->
+          <div class="guide-card">
+            <div class="guide-badge-circle">1</div>
+            <div class="guide-card-content">
+              <h3>GitHub Personal Access Token (PAT)</h3>
+              <p class="guide-desc">Secure key to upload solutions. <strong>Do NOT select any extra checkboxes (only select "repo").</strong></p>
+              <ol class="guide-list">
+                <li>Open the <a href="https://github.com/settings/tokens/new?scopes=repo&description=CommitDSA" target="_blank" rel="noopener noreferrer">GitHub New Token Page</a>.</li>
+                <li>Ensure **ONLY** the <strong><code>repo</code></strong> checkbox is selected (required to save files).</li>
+                <li>Click <strong>Generate token</strong> at the bottom and copy your key (starts with <code>ghp_</code>).</li>
+              </ol>
+            </div>
+          </div>
+
+          <!-- Step 2: Repository Path -->
+          <div class="guide-card">
+            <div class="guide-badge-circle">2</div>
+            <div class="guide-card-content">
+              <h3>GitHub Repository Path</h3>
+              <p class="guide-desc">Your target repository to save solutions.</p>
+              <ol class="guide-list">
+                <li>Create a repository via the <a href="https://github.com/new" target="_blank" rel="noopener noreferrer">New Repository page</a> (Public or Private).</li>
+                <li>Copy the path formatted as <strong><code>username/repo-name</code></strong>.</li>
+                <li>Example: If username is <em>alex</em> and repo is <em>dsa</em>, path is: <span class="highlight-text">alex/dsa</span>.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Security Assurance Banner -->
+      <div class="security-section">
+        <h3 class="security-title">🔒 100% Private & Secure</h3>
+        <ul class="security-list">
+          <li><strong>No Backend Server</strong>: CommitDSA has no database or external servers. We cannot see, store, or intercept your credentials.</li>
+          <li><strong>Local Storage</strong>: All keys, repository names, and settings are saved locally and securely in your own browser's storage (<code>chrome.storage.local</code>).</li>
+          <li><strong>Direct Connections</strong>: The extension communicates directly with GitHub API endpoints using encrypted HTTPS protocols.</li>
+        </ul>
+      </div>
+
+      <div class="footer-note" style="margin-top: 24px;">
+        <p>Happy Coding! Keep syncing your progress. 🚀</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-/* LeetSync Content Styles */
+/* CommitDSA Content Styles */
 
 .lc-tracker-overlay {
   position: fixed;
@@ -288,3 +288,171 @@
     text-shadow: 0 0 8px rgba(251, 146, 60, 0.5);
   }
 }
+
+/* ========================================================
+   CommitDSA v1.0.0 Manual Sync Page Sliding Side Modal Styles 
+   ======================================================== */
+.algosync-modal-overlay {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: auto;
+  height: auto;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  z-index: 9999999;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none; /* Allow underlying page scrolling/clicks */
+}
+
+.algosync-modal-overlay.show {
+  opacity: 1;
+}
+
+.algosync-modal-overlay.hide {
+  opacity: 0;
+}
+
+/* Default Theme Dark values inside the card */
+.algosync-modal-card {
+  --modal-bg: #35363a;         /* Chrome Active Toolbar Medium Grey */
+  --modal-border: rgba(234, 230, 219, 0.1);
+  --modal-text-primary: #eae6db;/* Warm Cream text */
+  --modal-text-secondary: #9c9790;
+  --modal-btn-cancel-bg: #202124;/* Chrome Dark Grey (no complete black) */
+  --modal-btn-cancel-hover: #292a2d;
+  --modal-btn-cancel-text: #eae6db;
+  --modal-btn-confirm-bg: #eae6db;/* Warm Cream confirm button */
+  --modal-btn-confirm-hover: #dcd7cb;
+  --modal-btn-confirm-text: #35363a;
+
+  background: var(--modal-bg);
+  border: 1px solid var(--modal-border);
+  border-radius: 10px; /* Reduced from 16px to match popup styling */
+  padding: 20px;
+  width: 320px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  color: var(--modal-text-primary);
+  transform: translateX(380px); /* Start off-screen on the right */
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto; /* Re-enable clicks for the card itself */
+}
+
+/* Apply light theme variables */
+.algosync-modal-overlay.theme-light .algosync-modal-card {
+  --modal-bg: #ffffff;
+  --modal-border: #e8e5df;      /* Warm beige border */
+  --modal-text-primary: #1f1b18;/* Soft warm black */
+  --modal-text-secondary: #6e675f;/* Warm grey text */
+  --modal-btn-cancel-bg: #f5f2eb;/* Soft cream */
+  --modal-btn-cancel-hover: #eae6db;
+  --modal-btn-cancel-text: #1f1b18;
+  --modal-btn-confirm-bg: #1f1b18;/* Espresso black */
+  --modal-btn-confirm-hover: #5c554e;
+  --modal-btn-confirm-text: #ffffff;
+  
+  box-shadow: 0 10px 30px rgba(31, 27, 24, 0.08), 0 1px 3px rgba(31, 27, 24, 0.02);
+}
+
+.algosync-modal-overlay.show .algosync-modal-card {
+  transform: translateX(0); /* Slide in */
+}
+
+.algosync-modal-overlay.hide .algosync-modal-card {
+  transform: translateX(380px); /* Slide out */
+}
+
+.algosync-modal-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--modal-border);
+  padding-bottom: 8px;
+  text-align: left;
+}
+
+.algosync-modal-logo {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--modal-btn-confirm-bg);
+  font-weight: 700;
+}
+
+.algosync-modal-header h3 {
+  font-size: 15px;
+  font-weight: 800;
+  margin: 2px 0 0 0;
+  color: var(--modal-text-primary);
+}
+
+.algosync-modal-body {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.algosync-modal-body .problem-info {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: var(--modal-text-primary);
+}
+
+.algosync-modal-body .target-info {
+  font-size: 10px;
+  color: var(--modal-text-secondary);
+  line-height: 1.4;
+}
+
+.algosync-modal-body .target-info span {
+  color: var(--modal-btn-confirm-bg);
+  font-weight: 600;
+}
+
+.algosync-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal-btn {
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn {
+  background: var(--modal-btn-cancel-bg);
+  color: var(--modal-btn-cancel-text);
+}
+
+.cancel-btn:hover {
+  background: var(--modal-btn-cancel-hover);
+}
+
+.confirm-btn {
+  background: var(--modal-btn-confirm-bg);
+  color: var(--modal-btn-confirm-text);
+}
+
+.confirm-btn:hover {
+  background: var(--modal-btn-confirm-hover);
+}
+
+.confirm-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+

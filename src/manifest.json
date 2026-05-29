@@ -1,25 +1,29 @@
 {
   "manifest_version": 3,
-  "name": "LeetSync",
+  "name": "CommitDSA",
   "version": "1.0.0",
-  "description": "Auto-detects LeetCode daily challenge completion with stunning success animations, streak tracking, and daily reminders.",
+  "description": "Automatically syncs your coding solutions from LeetCode and GeeksforGeeks to GitHub.",
   "permissions": [
     "storage",
-    "alarms",
-    "notifications",
-    "unlimitedStorage",
-    "cookies"
+    "alarms"
   ],
   "host_permissions": [
     "https://leetcode.com/*",
-    "https://*.leetcode.com/*"
+    "https://*.leetcode.com/*",
+    "https://*.geeksforgeeks.org/*",
+    "https://practiceapiorigin.geeksforgeeks.org/*",
+    "https://api.github.com/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background/service_worker.js",
+    "type": "module"
   },
   "content_scripts": [
     {
-      "matches": ["https://leetcode.com/problems/*"],
+      "matches": [
+        "https://leetcode.com/problems/*",
+        "https://*.geeksforgeeks.org/problems/*"
+      ],
       "js": ["content.js"],
       "css": ["content.css"],
       "run_at": "document_idle"
@@ -28,7 +32,10 @@
   "web_accessible_resources": [
     {
       "resources": ["inject.js"],
-      "matches": ["https://leetcode.com/*"]
+      "matches": [
+        "https://leetcode.com/*",
+        "https://*.geeksforgeeks.org/*"
+      ]
     }
   ],
   "icons": {

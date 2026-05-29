@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - CommitDSA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #fcfbf9;
+      --bg-card: #ffffff;
+      --border-color: #e8e5df;
+      --text-primary: #1f1b18;
+      --text-secondary: #6e675f;
+      --badge-bg: rgba(31, 27, 24, 0.04);
+      --badge-border: rgba(31, 27, 24, 0.1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-main: #202124;
+        --bg-card: #35363a;
+        --border-color: rgba(234, 230, 219, 0.1);
+        --text-primary: #eae6db;
+        --text-secondary: #9c9790;
+        --badge-bg: rgba(234, 230, 219, 0.08);
+        --badge-border: rgba(234, 230, 219, 0.15);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    }
+
+    .header {
+      margin-bottom: 30px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 20px;
+    }
+
+    .logo {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+
+    .logo span {
+      font-weight: 400;
+      color: var(--text-secondary);
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .date {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      margin-top: 30px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
+    }
+
+    p {
+      font-size: 15px;
+      margin-bottom: 16px;
+      color: var(--text-secondary);
+    }
+
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 20px;
+      font-size: 15px;
+      color: var(--text-secondary);
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    strong {
+      color: var(--text-primary);
+    }
+
+    .badge {
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    .footer {
+      margin-top: 40px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 20px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">Commit<span>DSA</span></div>
+      <h1>Privacy Policy</h1>
+      <div class="date">Last updated: May 29, 2026</div>
+    </div>
+
+    <p>CommitDSA is committed to ensuring the privacy and security of its users. This Privacy Policy details how we handle user data and information.</p>
+
+    <h2>1. Data Collection & Processing</h2>
+    <p><strong>100% Serverless & Decentralized</strong>: CommitDSA operates entirely on the client-side inside your browser sandbox. We do not host, operate, or maintain any external database or backend servers. We cannot access, view, or store any of your private coding submissions or authentication keys.</p>
+
+    <h2>2. Credentials Storage</h2>
+    <p>Your sensitive integration credentials, including your <strong>GitHub Personal Access Token (PAT)</strong>, repository path configs, and local problem statistics, are stored locally and securely in your own browser's encrypted sandbox storage (<span class="badge">chrome.storage.local</span>).</p>
+
+    <h2>3. External API Connections</h2>
+    <p>All calls made by the extension are direct HTTPS requests from your browser context to the official APIs of third-party platforms:</p>
+    <ul>
+      <li><strong>GitHub API</strong> (<span class="badge">https://api.github.com</span>) - Used to upload and modify solution files in your linked repository.</li>
+      <li><strong>LeetCode API</strong> (<span class="badge">https://leetcode.com/graphql</span>) - Used to fetch user stats and month coding schedules.</li>
+      <li><strong>GeeksforGeeks API</strong> (<span class="badge">https://practiceapi.geeksforgeeks.org/</span>) - Used to fetch daily POTD details and user scoring metrics.</li>
+    </ul>
+
+    <h2>4. Chrome Permissions Used</h2>
+    <p>We request the minimum set of permissions necessary to function:</p>
+    <ul>
+      <li><strong>storage</strong>: Required to save settings, preferences, and progress states locally.</li>
+      <li><strong>alarms</strong>: Used to trigger local background syncs periodically.</li>
+      <li><strong>tabs</strong>: Used to open the welcome onboarding page automatically when the extension is first installed.</li>
+    </ul>
+
+    <h2>5. Scope Limitation Warning</h2>
+    <p>To protect your account integrity, we advise users to configure their GitHub Personal Access Token (PAT) with only the narrowest scope required: the <span class="badge">repo</span> scope. Never grant administrative, user-profile modifications, or organizational access keys to CommitDSA.</p>
+
+    <h2>6. Changes to this Policy</h2>
+    <p>We may update this policy occasionally to align with web store guidelines. Updates will be reflected in the "Last updated" date above.</p>
+
+    <div class="footer">
+      &copy; 2026 CommitDSA. Project hosted securely on GitHub.
+    </div>
+  </div>
+</body>
+</html>
