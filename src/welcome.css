@@ -1,23 +1,24 @@
 :root {
-  --transition-speed: 0.3s;
-  --color-primary: #eae6db;   /* Warm Cream */
-  --color-success: #a39f99;
-  --bg-main: #202124;         /* Chrome Dark Grey (Background) */
-  --bg-card: #35363a;         /* Chrome Toolbar Grey (Cards) */
-  --border-color: rgba(234, 230, 219, 0.1);
-  --text-primary: #eae6db;    /* Warm Cream */
-  --text-secondary: #9c9790;
+  --transition-speed: 0.25s;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --color-primary: #f3f4f6;   /* Clean Off-White */
+  --color-success: #10b981;   /* Emerald Green */
+  --bg-main: #111216;         /* Deep Obsidian */
+  --bg-card: #1a1b20;         /* Rich Slate Card */
+  --border-color: rgba(255, 255, 255, 0.09); /* Crisper borders */
+  --text-primary: #f3f4f6;    /* Off-White Text */
+  --text-secondary: #9ca3af;  /* Muted Silver Text */
   
-  --bg-step-card: #202124;    /* Chrome Dark Grey (no complete black) */
-  --bg-step-card-hover: #292a2d;
-  --border-step-card-hover: rgba(234, 230, 219, 0.2);
-  --badge-bg: rgba(234, 230, 219, 0.08);
-  --badge-border: rgba(234, 230, 219, 0.15);
-  --badge-text: #eae6db;
-  --link-hover-color: #c5c0b8;
-  --code-text: #eae6db;
-  --code-bg: #202124;
-  --shadow-color: rgba(0, 0, 0, 0.3);
+  --bg-step-card: #111216;    /* Deep Obsidian */
+  --bg-step-card-hover: #1c1d22;
+  --border-step-card-hover: rgba(255, 255, 255, 0.15);
+  --badge-bg: rgba(255, 255, 255, 0.04);
+  --badge-border: rgba(255, 255, 255, 0.1);
+  --badge-text: #f3f4f6;
+  --link-hover-color: #d1d5db;
+  --code-text: #f3f4f6;
+  --code-bg: #16171b;
+  --shadow-color: rgba(0, 0, 0, 0.5);
 }
 
 * {
@@ -383,5 +384,93 @@ body {
 
 .security-list strong {
   color: var(--text-primary);
+}
+
+/* Note Banner Style */
+.note-banner {
+  background-color: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.note-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.note-content strong {
+  color: #f59e0b;
+}
+
+/* Animated Flow Diagram */
+.flow-diagram-container {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05);
+}
+
+.flow-diagram {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.flow-line {
+  stroke-dasharray: 4;
+  animation: flowLineDash 30s linear infinite;
+}
+
+@keyframes flowLineDash {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+.flow-dot {
+  filter: drop-shadow(0 0 3px currentColor);
+}
+
+/* Decorative Background Gradients for Premium feel */
+body::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 40%;
+  height: 40%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+body::after {
+  content: '';
+  position: absolute;
+  bottom: -10%;
+  right: -10%;
+  width: 40%;
+  height: 40%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
+  z-index: -1;
+  pointer-events: none;
 }
 

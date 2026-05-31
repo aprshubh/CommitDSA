@@ -121,11 +121,16 @@
 
       <!-- Quick Links -->
       <div class="s-section">
-        <button class="s-link-row" id="setup-guide-btn">
-          <span>📖 Setup Guide</span><span class="arrow">→</span>
-        </button>
-        <button class="s-link-row" id="report-bug-btn">
-          <span>🐛 Report Bug / Suggest Feature</span><span class="arrow">→</span>
+        <div class="two-col-grid">
+          <button class="s-link-row center" id="setup-guide-btn">
+            <span>📖 Setup Guide</span>
+          </button>
+          <button class="s-link-row center" id="rate-us-btn">
+            <span>⭐ Rate Us</span>
+          </button>
+        </div>
+        <button class="s-link-row center" id="report-bug-btn" style="width: 100%;">
+          <span>🐛 Report Bug / Suggest Feature</span>
         </button>
       </div>
 
@@ -136,13 +141,15 @@
       <!-- User Handles -->
       <div class="s-label">USER HANDLES</div>
       <div class="s-section gh-section">
-        <div class="field-row">
-          <label class="field-lbl">GeeksforGeeks</label>
-          <input type="text" id="gfg-handle" class="field-input full" placeholder="e.g., aprshubh" />
-        </div>
-        <div class="field-row" style="margin-top: 10px;">
-          <label class="field-lbl">LeetCode</label>
-          <input type="text" id="lc-handle" class="field-input full" placeholder="e.g., aprshubh (Optional)" />
+        <div class="two-col-grid">
+          <div class="field-row">
+            <label class="field-lbl">GeeksforGeeks</label>
+            <input type="text" id="gfg-handle" class="field-input full" placeholder="e.g., aprshubh" />
+          </div>
+          <div class="field-row">
+            <label class="field-lbl">LeetCode</label>
+            <input type="text" id="lc-handle" class="field-input full" placeholder="e.g., aprshubh" />
+          </div>
         </div>
       </div>
 
@@ -157,14 +164,26 @@
           </div>
         </div>
         <div class="field-row">
-          <label class="field-lbl">Token</label>
+          <div class="field-label-row token-label-row">
+            <label class="field-lbl">GitHub Token</label>
+            <div class="token-actions">
+              <button type="button" class="token-action-btn" id="generate-token-btn">Generate</button>
+              <button type="button" class="token-action-btn" id="new-token-btn" disabled>New</button>
+            </div>
+          </div>
           <div class="field-wrap">
             <input type="password" id="github-token" class="field-input" placeholder="ghp_..." />
             <button class="toggle-password-btn" data-target="github-token">👁️</button>
           </div>
         </div>
         <div class="field-row">
-          <label class="field-lbl">Repository</label>
+          <div class="field-label-row token-label-row">
+            <label class="field-lbl">Repository</label>
+            <div class="token-actions">
+              <button type="button" class="token-action-btn" id="create-repo-btn">Create</button>
+              <button type="button" class="token-action-btn" id="new-repo-btn" disabled>New</button>
+            </div>
+          </div>
           <input type="text" id="github-repo" class="field-input full" placeholder="aprshubh/DSA" />
         </div>
         <button class="save-btn" id="save-config-btn">Save Configuration</button>

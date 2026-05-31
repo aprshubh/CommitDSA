@@ -321,6 +321,18 @@ function renderStats(solvedStats) {
   });
 }
 
+function showSyncError(errMsg) {
+  const el = document.getElementById('countdown-text');
+  if (!el) return;
+  if (countdownTimer) clearInterval(countdownTimer);
+  el.textContent = 'Sync Failed: Check connection ⚠️';
+  el.style.color = 'var(--hard)';
+  setTimeout(() => {
+    el.style.color = '';
+    restartCountdown();
+  }, 3000);
+}
+
 /* ================================================================
    COUNTDOWN
 ================================================================ */
@@ -377,7 +389,7 @@ function loadDashboard(forceRefresh = false) {
   const prefix = cfg.prefix;
 
   // Storage keys
-  const completedKey   = prefix + 'completedDates';
+  const completedKey   = activePlatform === 'leetcode' ? 'leetcode_completedDates' : prefix + 'completedDates';
   const statsKey       = activePlatform === 'leetcode' ? 'leetcode_solvedStats' : prefix + 'solvedStats';
   const dailyQuestKey  = activePlatform === 'leetcode' ? 'leetcode_dailyQuestion' : prefix + 'dailyQuestion';
 
@@ -403,6 +415,9 @@ function loadDashboard(forceRefresh = false) {
     if (chrome.runtime.lastError) {
       console.warn('[CommitDSA] Background msg error:', chrome.runtime.lastError.message);
       return;
+    }
+    if (res && res.error && forceRefresh) {
+      showSyncError(res.error);
     }
     // Re-read from storage — background has now written fresh data there
     renderFromStorage();
@@ -457,6 +472,73 @@ function buildPlatformCards() {
 /* ================================================================
    SETTINGS — Load + Save
 ================================================================ */
+function updateGitHubButtonsState() {
+  const generateTokenBtn = document.getElementById('generate-token-btn');
+  const newTokenBtn      = document.getElementById('new-token-btn');
+  const createRepoBtn    = document.getElementById('create-repo-btn');
+  const newRepoBtn       = document.getElementById('new-repo-btn');
+
+  chrome.storage.local.get(['githubToken', 'githubRepo'], ({ githubToken, githubRepo }) => {
+    if (generateTokenBtn && newTokenBtn) {
+      const hasToken = !!(githubToken && githubToken.trim().length > 0);
+      generateTokenBtn.disabled = hasToken;
+      newTokenBtn.disabled = !hasToken;
+    }
+    if (createRepoBtn && newRepoBtn) {
+      const hasRepo = !!(githubRepo && githubRepo.trim().length > 0);
+      createRepoBtn.disabled = hasRepo;
+      newRepoBtn.disabled = !hasRepo;
+    }
+  });
+}
+
+function showInlineConfirm(targetElement, message, onConfirm) {
+  const parent = targetElement.closest('.field-row');
+  if (!parent || parent.querySelector('.inline-confirm-box')) return;
+
+  const confirmBox = document.createElement('div');
+  confirmBox.className = 'inline-confirm-box';
+
+  const msgSpan = document.createElement('span');
+  msgSpan.className = 'confirm-msg';
+  msgSpan.textContent = message;
+
+  const actionsDiv = document.createElement('div');
+  actionsDiv.className = 'confirm-actions';
+
+  const yesBtn = document.createElement('button');
+  yesBtn.type = 'button';
+  yesBtn.className = 'inline-confirm-btn yes-btn';
+  yesBtn.textContent = 'Reset';
+
+  const noBtn = document.createElement('button');
+  noBtn.type = 'button';
+  noBtn.className = 'inline-confirm-btn no-btn';
+  noBtn.textContent = 'Cancel';
+
+  actionsDiv.appendChild(noBtn);
+  actionsDiv.appendChild(yesBtn);
+  confirmBox.appendChild(msgSpan);
+  confirmBox.appendChild(actionsDiv);
+
+  const labelRow = parent.querySelector('.field-label-row');
+  if (labelRow) {
+    labelRow.after(confirmBox);
+  } else {
+    parent.appendChild(confirmBox);
+  }
+
+  noBtn.addEventListener('click', () => {
+    confirmBox.style.animation = 'slideUp var(--speed) var(--ease) forwards';
+    setTimeout(() => confirmBox.remove(), 200);
+  });
+
+  yesBtn.addEventListener('click', () => {
+    confirmBox.remove();
+    onConfirm();
+  });
+}
+
 function loadSettingsValues() {
   chrome.storage.local.get(['githubToken', 'githubRepo', 'syncMode', 'gfg_username', 'leetcode_username', 'leetcode_solvedStats'], (data) => {
     const tokenEl  = document.getElementById('github-token');
@@ -477,6 +559,8 @@ function loadSettingsValues() {
     const mode = data.syncMode || 'manual';
     if (manualEl && mode === 'manual') manualEl.checked = true;
     if (autoEl   && mode === 'auto')   autoEl.checked   = true;
+
+    updateGitHubButtonsState();
   });
 }
 
@@ -526,6 +610,7 @@ function saveSettings() {
     
     // Refresh the UI to immediately reflect platform changes
     buildTabs();
+    updateGitHubButtonsState();
   });
 }
 
@@ -555,6 +640,72 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Save config
   document.getElementById('save-config-btn')
     ?.addEventListener('click', saveSettings);
+
+  // ── GitHub Token buttons
+  const tokenInput = document.getElementById('github-token');
+
+  const generateTokenBtn = document.getElementById('generate-token-btn');
+  if (generateTokenBtn) {
+    generateTokenBtn.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'https://github.com/settings/tokens/new?scopes=repo&description=CommitDSA' });
+    });
+  }
+
+  const newTokenBtn = document.getElementById('new-token-btn');
+  if (newTokenBtn) {
+    newTokenBtn.addEventListener('click', () => {
+      showInlineConfirm(newTokenBtn, 'Reset GitHub Token?', () => {
+        if (tokenInput) tokenInput.value = '';
+        
+        chrome.storage.local.set({
+          githubToken: '',
+          githubEnabled: false
+        }, () => {
+          updateGitHubButtonsState();
+          
+          const pushToggle = document.getElementById('push-toggle');
+          if (pushToggle) pushToggle.checked = false;
+          const hint = document.getElementById('no-gh-hint');
+          if (hint) hint.style.display = 'none';
+
+          chrome.tabs.create({ url: 'https://github.com/settings/tokens/new?scopes=repo&description=CommitDSA' });
+        });
+      });
+    });
+  }
+
+  // ── GitHub Repository buttons
+  const repoInput = document.getElementById('github-repo');
+
+  const createRepoBtn = document.getElementById('create-repo-btn');
+  if (createRepoBtn) {
+    createRepoBtn.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'https://github.com/new' });
+    });
+  }
+
+  const newRepoBtn = document.getElementById('new-repo-btn');
+  if (newRepoBtn) {
+    newRepoBtn.addEventListener('click', () => {
+      showInlineConfirm(newRepoBtn, 'Reset Repository?', () => {
+        if (repoInput) repoInput.value = '';
+
+        chrome.storage.local.set({
+          githubRepo: '',
+          githubEnabled: false
+        }, () => {
+          updateGitHubButtonsState();
+
+          const pushToggle = document.getElementById('push-toggle');
+          if (pushToggle) pushToggle.checked = false;
+          const hint = document.getElementById('no-gh-hint');
+          if (hint) hint.style.display = 'none';
+
+          chrome.tabs.create({ url: 'https://github.com/new' });
+        });
+      });
+    });
+  }
 
   // ── Refresh button with Cooldown
   const refreshBtn = document.getElementById('refresh-btn');
@@ -593,6 +744,12 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('setup-guide-btn')
     ?.addEventListener('click', () =>
       chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') })
+    );
+
+  // ── Rate Us
+  document.getElementById('rate-us-btn')
+    ?.addEventListener('click', () =>
+      chrome.tabs.create({ url: 'https://chromewebstore.google.com/detail/commitdsa/hnkhnpgnfccaeicaaekcooopbpncnkgm/reviews' })
     );
 
   // ── Report Bug

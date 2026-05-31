@@ -16,16 +16,7 @@ const injectScript = () => {
 };
 injectScript();
 
-/**
- * Loads custom Google Fonts used by the extension's UI components injected into the page.
- */
-const injectFonts = () => {
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap';
-  document.head.appendChild(link);
-};
-injectFonts();
+
 
 
 /**

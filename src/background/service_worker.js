@@ -1,14 +1,46 @@
 /**
  * @fileoverview Main Service Worker for CommitDSA.
- * Coordinates messaging, alarms, and data synchronization across platforms.
+ * Integrates Platform classes, AlarmManager, and ScriptManager to coordinate 
+ * messaging, alarms, and dynamic script loading reactively.
  */
 
 import { pushToGitHub, cleanRepoPath } from './github.js';
-import { fetchAndSyncChallenges, fetchUserSolvedStats } from './leetcode.js';
-import { fetchGfgDailyChallenge, fetchGfgUserStats } from './gfg.js';
+import { PlatformFactory } from './classes/PlatformFactory.js';
+import { AlarmManager } from './classes/AlarmManager.js';
+import { ScriptManager } from './classes/ScriptManager.js';
 import { getActiveDateString } from './utils.js';
 
 const CACHE_DURATION = 60 * 60 * 1000; // 1 Hour
+
+// ==========================================
+// REACTIVE CONFIG SYNC (STORAGE LISTENER)
+// ==========================================
+
+/**
+ * Synchronizes alarms and content scripts according to the list of enabled platforms.
+ */
+async function syncEnabledPlatformsState() {
+  try {
+    const res = await chrome.storage.local.get(['enabledPlatforms']);
+    const enabled = res.enabledPlatforms || ['leetcode', 'gfg'];
+    
+    // Dynamically manage alarms and content script injections
+    await AlarmManager.updateAlarms(enabled);
+    await ScriptManager.updateContentScripts(enabled);
+  } catch (err) {
+    console.error('[CommitDSA] Error syncing enabled platforms state:', err);
+  }
+}
+
+// Listen to settings updates in local storage to dynamically update alarms/scripts
+chrome.storage.onChanged.addListener(async (changes, areaName) => {
+  if (areaName === 'local' && changes.enabledPlatforms) {
+    const enabled = changes.enabledPlatforms.newValue || ['leetcode', 'gfg'];
+    console.log('[CommitDSA] Enabled platforms configuration updated:', enabled);
+    await AlarmManager.updateAlarms(enabled);
+    await ScriptManager.updateContentScripts(enabled);
+  }
+});
 
 // ==========================================
 // MESSAGE HANDLERS
@@ -18,7 +50,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     chrome.storage.local.get(['githubEnabled', 'syncMode'], (res) => {
       sendResponse({
         githubEnabled: res.githubEnabled || false,
-        syncMode: res.syncMode || 'manual'  // default 'manual' to match popup UI
+        syncMode: res.syncMode || 'manual' // default 'manual' to match popup UI
       });
     });
     return true;
@@ -90,6 +122,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         let category = 'easy';
         if (diff === 'medium') category = 'medium';
         else if (diff === 'hard') category = 'hard';
+        else if (diff === 'basic' || diff === 'school') category = 'basic';
         
         solvedStats[category] = (solvedStats[category] || 0) + 1;
         solvedStats.total = (solvedStats.total || 0) + 1;
@@ -110,28 +143,51 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
 
-  // Handle Dashboard requests from the popup
+  // Handle Dashboard requests from the popup (Unified Polymorphic Flow)
   if (request.type === 'GET_DASHBOARD_DATA' || request.type === 'FORCE_REFRESH_DAILY') {
     const platform = request.platform || 'leetcode';
     
-    if (platform === 'leetcode') {
+    try {
+      const platformInstance = PlatformFactory.getPlatform(platform);
+      const prefix = platformInstance.storagePrefix;
+
+      const completedKey = `${prefix}_completedDates`;
+      const statsKey = platform === 'leetcode' ? 'leetcode_solvedStats' : `${prefix}_solvedStats`;
+      const dailyQuestKey = platform === 'leetcode' ? 'leetcode_dailyQuestion' : `${prefix}_dailyQuestion`;
+      const lastSyncTimeKey = platform === 'leetcode' ? 'lastSyncTime' : 'lastGfgSyncTime';
+
       const fetchFreshData = () => {
-        Promise.all([
-          fetchAndSyncChallenges(),
-          fetchUserSolvedStats()
-        ]).then(([syncedData, solvedStats]) => {
-          chrome.storage.local.set({ lastSyncTime: Date.now() });
+        // Fetch daily POTD challenge
+        platformInstance.fetchDailyChallenge().then(async (challengeData) => {
+          // Check for user config to fetch stats
+          const config = await chrome.storage.local.get([`${prefix}_username`]);
+          const username = config[`${prefix}_username`];
+          
+          let solvedStats = null;
+          if (username) {
+            solvedStats = await platformInstance.fetchUserStats(username);
+          } else {
+            // Load current cached stats if username is missing
+            const cache = await chrome.storage.local.get([statsKey]);
+            solvedStats = cache[statsKey] || null;
+          }
+
+          await chrome.storage.local.set({ [lastSyncTimeKey]: Date.now() });
+
           sendResponse({
-            ...syncedData,
-            solvedStats: solvedStats || null
+            dailyQuestion: challengeData.dailyQuestion,
+            completedDates: challengeData.completedDates,
+            solvedStats: solvedStats
           });
         }).catch((err) => {
-          console.warn('[CommitDSA] LeetCode Sync failed:', err);
-          chrome.storage.local.get(['leetcode_dailyQuestion', 'leetcode_completedDates', 'leetcode_solvedStats'], (cache) => {
+          console.warn(`[CommitDSA] ${platform} fresh sync failed:`, err);
+          // Return cache on fail with error message
+          chrome.storage.local.get([completedKey, statsKey, dailyQuestKey], (cache) => {
             sendResponse({
-              dailyQuestion: cache.leetcode_dailyQuestion || null,
-              completedDates: cache.leetcode_completedDates || [],
-              solvedStats: cache.leetcode_solvedStats || null
+              dailyQuestion: cache[dailyQuestKey] || null,
+              completedDates: cache[completedKey] || [],
+              solvedStats: cache[statsKey] || null,
+              error: err.message || 'Sync failed'
             });
           });
         });
@@ -140,68 +196,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (request.type === 'FORCE_REFRESH_DAILY') {
         fetchFreshData();
       } else {
-        chrome.storage.local.get(['lastSyncTime', 'leetcode_dailyQuestion', 'leetcode_completedDates', 'leetcode_solvedStats'], (cache) => {
-          const isCacheValid = cache.lastSyncTime && (Date.now() - cache.lastSyncTime < CACHE_DURATION);
-          if (isCacheValid && cache.leetcode_dailyQuestion) {
+        chrome.storage.local.get([lastSyncTimeKey, completedKey, statsKey, dailyQuestKey], (cache) => {
+          const isCacheValid = cache[lastSyncTimeKey] && (Date.now() - cache[lastSyncTimeKey] < CACHE_DURATION);
+          if (isCacheValid && cache[dailyQuestKey]) {
             sendResponse({
-              dailyQuestion: cache.leetcode_dailyQuestion || null,
-              completedDates: cache.leetcode_completedDates || [],
-              solvedStats: cache.leetcode_solvedStats || null
+              dailyQuestion: cache[dailyQuestKey] || null,
+              completedDates: cache[completedKey] || [],
+              solvedStats: cache[statsKey] || null
             });
           } else {
             fetchFreshData();
           }
         });
       }
-    } else if (platform === 'gfg') {
-      const completedKey = 'gfg_completedDates';
-      const solvedKey = 'gfg_solvedStats';
-      const dailyQuestionKey = 'gfg_dailyQuestion';
-
-      chrome.storage.local.get([completedKey, solvedKey, dailyQuestionKey, 'lastGfgSyncTime'], async (data) => {
-        const completedDates = data[completedKey] || [];
-        
-        const todayStr = getActiveDateString('gfg');
-        let dailyQuestion = data[dailyQuestionKey] || null;
-
-        // Refresh POTD if missing or forced or different date
-        if (!dailyQuestion || dailyQuestion.date !== todayStr || request.type === 'FORCE_REFRESH_DAILY') {
-          const freshPotd = await fetchGfgDailyChallenge();
-          if (freshPotd) {
-            dailyQuestion = freshPotd;
-            
-            const updateMap = {};
-            updateMap[dailyQuestionKey] = freshPotd;
-            await chrome.storage.local.set(updateMap);
-          }
-        }
-
-        let solvedStats = data[solvedKey] || null;
-        
-        // Rate-limit cache logic for GFG to prevent IP bans
-        const isCacheValid = data.lastGfgSyncTime && (Date.now() - data.lastGfgSyncTime < CACHE_DURATION);
-
-        if (request.type === 'FORCE_REFRESH_DAILY') {
-          const freshStats = await fetchGfgUserStats();
-          if (freshStats) {
-            solvedStats = freshStats;
-            chrome.storage.local.set({ lastGfgSyncTime: Date.now() });
-          }
-        } else if (!isCacheValid || !solvedStats) {
-          // Await fresh stats so the response is not stale
-          const freshStats = await fetchGfgUserStats();
-          if (freshStats) {
-            solvedStats = freshStats;
-            chrome.storage.local.set({ lastGfgSyncTime: Date.now() });
-          }
-        }
-
-        sendResponse({
-          dailyQuestion: dailyQuestion,
-          completedDates: completedDates,
-          solvedStats: solvedStats
-        });
-      });
+    } catch (e) {
+      console.error(`[CommitDSA] Error in Dashboard coordinator for ${platform}:`, e);
+      sendResponse({ error: e.message });
     }
     return true; // Keep message channel open for async response
   }
@@ -211,26 +221,46 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // ALARMS & STARTUP
 // ==========================================
 
-function triggerLeetcodeFetch() { fetchAndSyncChallenges(); }
-function triggerGfgFetch()     { fetchGfgDailyChallenge(); }
+async function triggerDailyAlarms(alarmName) {
+  try {
+    if (alarmName === "fetchDailyChallenge") {
+      const leetcode = PlatformFactory.getPlatform('leetcode');
+      await leetcode.fetchDailyChallenge();
+    }
+    if (alarmName === "fetchGfgDailyChallenge") {
+      const gfg = PlatformFactory.getPlatform('gfg');
+      await gfg.fetchDailyChallenge();
+    }
+  } catch (err) {
+    console.error(`[CommitDSA] Daily fetch execution failed for alarm ${alarmName}:`, err);
+  }
+}
 
 // Create daily alarms and open welcome page
-chrome.runtime.onInstalled.addListener((details) => {
+chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === 'install') {
     chrome.tabs.create({ url: chrome.runtime.getURL('welcome.html') });
   }
-  chrome.alarms.create("fetchDailyChallenge", { periodInMinutes: 1440 });
-  chrome.alarms.create("fetchGfgDailyChallenge", { periodInMinutes: 1440 });
-  triggerLeetcodeFetch();
-  triggerGfgFetch();
+
+  // Initialize enabled platforms state in local storage if not already configured
+  const res = await chrome.storage.local.get(['enabledPlatforms']);
+  if (!res.enabledPlatforms) {
+    await chrome.storage.local.set({ enabledPlatforms: ['leetcode', 'gfg'] });
+  }
+
+  await syncEnabledPlatformsState();
+  
+  // Force initial fetches for active alarms
+  await triggerDailyAlarms("fetchDailyChallenge");
+  await triggerDailyAlarms("fetchGfgDailyChallenge");
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === "fetchDailyChallenge") triggerLeetcodeFetch();
-  if (alarm.name === "fetchGfgDailyChallenge") triggerGfgFetch();
+  triggerDailyAlarms(alarm.name);
 });
 
-chrome.runtime.onStartup.addListener(() => {
-  triggerLeetcodeFetch();
-  triggerGfgFetch();
+chrome.runtime.onStartup.addListener(async () => {
+  await syncEnabledPlatformsState();
+  await triggerDailyAlarms("fetchDailyChallenge");
+  await triggerDailyAlarms("fetchGfgDailyChallenge");
 });

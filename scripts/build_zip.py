@@ -37,8 +37,8 @@ def build_extension():
         for root, dirs, files in os.walk(src_dir):
             for file in files:
                 file_path = Path(root) / file
-                # Skip OS generated files
-                if file == '.DS_Store':
+                # Skip OS generated files and raw high-res icon
+                if file == '.DS_Store' or file == 'icon.png':
                     continue
                     
                 # Calculate relative path for zip internal structure
