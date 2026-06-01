@@ -1,7 +1,17 @@
 # CommitDSA 🚀 | Auto-Sync LeetCode & GeeksforGeeks to GitHub
 
+**Developed with ❤️ by [Shubh](https://github.com/aprshubh)**
+
 **Looking for the best Chrome extension to push your LeetCode code to GitHub?** 
 Welcome to **CommitDSA**! This is a powerful, 100% serverless, and privacy-first extension designed to automatically sync and back up your accepted coding solutions from LeetCode and GeeksforGeeks (GFG) directly to your GitHub repository.
+
+---
+
+## 📥 Installation
+
+Get CommitDSA directly from the official Chrome Web Store and supercharge your DSA profile in seconds:
+
+👉 **[Download CommitDSA on the Chrome Web Store](https://chromewebstore.google.com/detail/commitdsa/hnkhnpgnfccaeicaaekcooopbpncnkgm?pli=1)** 👈
 
 ---
 
