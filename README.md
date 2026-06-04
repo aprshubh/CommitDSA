@@ -1,4 +1,4 @@
-# CommitDSA: Chrome Extension for LeetCode and GitHub Synchronization
+# CommitDSA: Chrome Extension for LeetCode and GeeksforGeeks GitHub Synchronization
 
 CommitDSA is a serverless, privacy-first Google Chrome Extension designed to automatically synchronize and backup accepted coding solutions from LeetCode and GeeksforGeeks (GFG) directly to a specified GitHub repository. Built under the Manifest V3 specification, CommitDSA operates entirely client-side without relying on external databases or backend servers.
 
