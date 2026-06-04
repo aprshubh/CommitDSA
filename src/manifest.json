@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CommitDSA - Sync LeetCode & GFG to GitHub",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Automatically sync and backup LeetCode & GeeksforGeeks (GFG) accepted solutions directly to GitHub.",
   "permissions": [
     "storage",

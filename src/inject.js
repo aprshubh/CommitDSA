@@ -164,22 +164,82 @@
     return '';
   }
 
-  function getDifficultyFromDOM() {
+  function getDifficultyFromDOM(platform) {
+    const targetPlatform = platform || (window.location.hostname.includes('leetcode') ? 'LeetCode' : 'GFG');
+    
+    if (targetPlatform === 'LeetCode') {
+      const lcDiff = document.querySelector('[class*="text-difficulty-"], [class*="text-easy"], [class*="text-medium"], [class*="text-hard"]');
+      if (lcDiff) {
+        const txt = lcDiff.textContent.trim();
+        if (['Easy', 'Medium', 'Hard'].includes(txt)) {
+          return txt;
+        }
+      }
+    } else if (targetPlatform === 'GFG') {
+      // 1. Try GFG new layout problems_header_description selector
+      const descEl = document.querySelector('div[class*="problems_header_description"]');
+      if (descEl) {
+        const spans = descEl.querySelectorAll('span');
+        for (let span of spans) {
+          if (span.textContent.includes('Difficulty:')) {
+            const strong = span.querySelector('strong');
+            if (strong) return strong.textContent.trim();
+            const cleaned = span.textContent.replace('Difficulty:', '').trim();
+            if (['School', 'Basic', 'Easy', 'Medium', 'Hard'].includes(cleaned)) {
+              return cleaned;
+            }
+          }
+        }
+      }
+      
+      // 2. Try specific selectors for GFG difficulty badge
+      const selectors = [
+        '.problems_header_strength__e835_',
+        'div[class*="problems_header_strength"]',
+        '.problem-tab__difficulty',
+        '.problems-header .difficulty',
+        '.problems_header_strength_rating__',
+        'div[class*="problems_header_strength_rating"]'
+      ];
+      for (const sel of selectors) {
+        const el = document.querySelector(sel);
+        if (el) {
+          const txt = el.textContent.trim();
+          if (['School', 'Basic', 'Easy', 'Medium', 'Hard'].includes(txt)) {
+            return txt;
+          }
+        }
+      }
+
+      // 3. Search under GFG main content container
+      const container = document.querySelector('.problems-header, .problems_header_content, .problem-statement, .problem-tab');
+      if (container) {
+        const elements = container.querySelectorAll('div, span, p, a, h4');
+        for (let el of elements) {
+          if (el.childNodes.length === 1 || el.children.length === 0) {
+            const txt = (el.textContent || '').trim();
+            if (['School', 'Basic', 'Easy', 'Medium', 'Hard'].includes(txt)) {
+              return txt;
+            }
+          }
+        }
+      }
+    }
+
+    // Fallback: search DOM for matching text, excluding common sidebar/nav areas
     const elements = document.querySelectorAll('div, span, p, a, h4');
     for (let el of elements) {
+      if (el.closest('nav') || el.closest('header') || el.closest('[class*="sidebar"]') || el.closest('[class*="recommend"]')) {
+        continue;
+      }
       if (el.childNodes.length === 1 || el.children.length === 0) {
         const txt = (el.textContent || '').trim();
-        if (txt === 'Easy' || txt === 'Medium' || txt === 'Hard' || txt === 'School' || txt === 'Basic') {
+        if (['School', 'Basic', 'Easy', 'Medium', 'Hard'].includes(txt)) {
           return txt;
         }
       }
     }
-    // LeetCode selector
-    const lcDiff = document.querySelector('[class*="text-difficulty-"], [class*="text-easy"], [class*="text-medium"], [class*="text-hard"]');
-    if (lcDiff) return lcDiff.textContent.trim();
-    // GFG selector
-    const gfgDiff = document.querySelector('.problem-tab__difficulty, .difficulty, [class*="difficulty"]');
-    if (gfgDiff) return gfgDiff.textContent.trim();
+
     return 'Medium';
   }
 
@@ -249,7 +309,7 @@
       platform: platform,
       titleSlug: titleSlug,
       title: getTitleFromDOM(platform),
-      difficulty: getDifficultyFromDOM(),
+      difficulty: getDifficultyFromDOM(platform),
       code: code,
       lang: lang
     }, '*');

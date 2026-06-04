@@ -1,76 +1,67 @@
-# CommitDSA 🚀 | Auto-Sync LeetCode & GeeksforGeeks to GitHub
+# CommitDSA: Chrome Extension for LeetCode and GitHub Synchronization
 
-**Developed with ❤️ by [Shubh](https://github.com/aprshubh)**
-
-**Looking for the best Chrome extension to push your LeetCode code to GitHub?** 
-Welcome to **CommitDSA**! This is a powerful, 100% serverless, and privacy-first extension designed to automatically sync and back up your accepted coding solutions from LeetCode and GeeksforGeeks (GFG) directly to your GitHub repository.
+CommitDSA is a serverless, privacy-first Google Chrome Extension designed to automatically synchronize and backup accepted coding solutions from LeetCode and GeeksforGeeks (GFG) directly to a specified GitHub repository. Built under the Manifest V3 specification, CommitDSA operates entirely client-side without relying on external databases or backend servers.
 
 ---
 
-## 📥 Installation
+## Key Features
 
-Get CommitDSA directly from the official Chrome Web Store and supercharge your DSA profile in seconds:
-
-👉 **[Download CommitDSA on the Chrome Web Store](https://chromewebstore.google.com/detail/commitdsa/hnkhnpgnfccaeicaaekcooopbpncnkgm?pli=1)** 👈
-
----
-
-## 🌟 Why Choose CommitDSA? (Key Features)
-
-### 🎨 Beautiful, Clutter-Free UI (Light & Dark Mode)
-Experience a premium, unified developer dashboard. Track your LeetCode Global Rank and GeeksforGeeks Score side-by-side, toggle seamlessly between **Light and Dark modes**, and manage settings without leaving your coding flow.
-
-![CommitDSA Light Mode Dashboard](CommitDSA_Light_Screenshot.png)
-![CommitDSA Dark Mode Dashboard](CommitDSA_Dark_Screenshot_3x.jpg)
-
-### 🌐 Multi-Platform & Modular (Zero Bloatware)
-CommitDSA currently supports LeetCode and GeeksforGeeks (with more platforms coming based on community demand!). 
-* **Complete Control:** Only toggle on the platforms you actually use.
-* **Zero Background Processes:** Disabled platforms are completely shut off. We use dynamic scripting so if a platform is off, absolutely zero background code runs on your browser, saving your RAM and CPU.
-
-### 🧠 Smart Code Formatting & Metadata
-Say goodbye to messy repositories. CommitDSA automatically:
-* Detects the programming language you used and saves the file with the correct extension (e.g., `.cpp`, `.py`, `.java`).
-* Injects rich metadata into the top of your code as comments, including the **Problem Link, Difficulty Level, and Platform Name**.
-* Organizes files neatly into respective directories (e.g., `LeetCode/` and `GFG/`).
-
-### 🔒 Top-Notch Security (100% Serverless)
-Your data is exactly that—*yours*.
-* **No Backend Servers:** There are no external databases or servers tracking your activity.
-* **Local Storage:** Your GitHub Personal Access Token (PAT) and configurations are stored securely inside your browser's local sandbox (`chrome.storage.local`). All API calls are made directly from your browser to GitHub.
-
-![CommitDSA Light Settings](CommitDSA_Settings_Light_Screenshot.png)
-![CommitDSA Dark Settings](CommitDSA_Settings_Dark_Screenshot.png)
+- **Automated and Manual Synchronization**: Pushes solved problems immediately upon acceptance or prompts user confirmation via an in-page modal.
+- **Unified Developer Dashboard**: Displays LeetCode global ranking and GeeksforGeeks overall score side-by-side inside a dark-themed popup interface.
+- **Difficulty-Based Categorization (v1.2.0)**: Solutions are automatically sorted into difficulty-specific subdirectories inside the repository:
+  - **LeetCode**: `LeetCode/Easy/`, `LeetCode/Medium/`, `LeetCode/Hard/`
+  - **GeeksforGeeks**: `GFG/Basic/` (includes School and Basic), `GFG/Easy/`, `GFG/Medium/`, `GFG/Hard/`
+- **GeeksforGeeks Difficulty Resolution**: Directly parses the exact GFG metadata to prevent false categorization, resolving the common issue where all problems are classified as Medium.
+- **Privacy-Preserving Architecture**: GitHub Personal Access Tokens (PAT) and configurations are stored securely inside the browser's local sandbox (`chrome.storage.local`).
+- **Clean Code Headers**: Prefixes pushed code with structured comments containing the problem link, platform name, and difficulty rating.
 
 ---
 
-## 🏗️ Technical Architecture (v1.1.0 Upgrade)
+## Technical Architecture
 
-This extension has been refactored to follow state-of-the-art developer guidelines under **Manifest V3** to ensure maximum efficiency:
-* **Object-Oriented Platform Layer:** Uses an abstract class design (`CodingPlatform` base with `LeetCodePlatform` and `GfgPlatform` subclasses) decoupled via a `PlatformFactory`. This makes onboarding new platforms (like Codeforces, CodeChef, etc.) extremely straightforward.
-* **Dynamic Script Injection (Chrome Scripting API):** No static content scripts. Content scripts are registered or unregistered dynamically based on user settings. 
-* **Dynamic Alarms Management:** Background alarms and stats check polling are managed dynamically (`AlarmManager`) to reduce browser wake-ups, conserving battery life.
+The extension is designed around modular, object-oriented concepts to ensure high performance and maintainability:
+
+- **Object-Oriented Platform Layer**: Uses an abstract `CodingPlatform` class subclassed into `LeetCodePlatform` and `GfgPlatform`, managed via a `PlatformFactory`. This pattern simplifies onboarding new platforms.
+- **Dynamic Script Injection**: Content scripts are registered and unregistered dynamically using the `chrome.scripting` API based on user settings. If a platform is disabled, no code executes on its domains.
+- **Network Interception**: Intercepts `window.fetch` and `XMLHttpRequest` in the page's main world execution context (`inject.js`) to capture the exact submitted code upon acceptance.
+- **Alarm and Caching Manager**: Uses `AlarmManager` for scheduled background stat updates and caches results (1-hour TTL) to prevent rate limits.
 
 ---
 
-## 🛑 FOR CONTRIBUTORS (MUST READ)
+## Installation
 
-If you want to contribute to this project, you are more than welcome! However, to maintain the high performance, security, and quality of this codebase, you MUST read our strict architectural rules before writing any code or opening a Pull Request.
-
-👉 **[Read the Extension Rules Here (docs/EXTENSION_RULES.md)]** 👈
-
-*Note: Any Pull Request that violates these rules (e.g., introducing memory leaks, using insecure remote code, or adding unnecessary permissions) will be rejected immediately.*
-
-### 🛠️ How to run the extension locally for development:
-1. Fork this repository and clone it to your PC.
+### Local Development Setup
+1. Clone this repository to your local system.
 2. Open Google Chrome and navigate to `chrome://extensions/`.
-3. Enable **Developer mode** (top right corner toggle).
-4. Click **Load unpacked** and select the `src/` folder from the cloned repository.
-5. Make your code changes in the `src/` folder and click the "Reload" icon on the extension card to see them live.
+3. Enable **Developer mode** via the toggle switch in the top-right corner.
+4. Click **Load unpacked** and select the `src/` directory from the cloned repository.
 
-### 📥 Submitting Changes
-1. Create a new branch for your feature (`git checkout -b feature-name`).
-2. Make sure your code adheres strictly to the `docs/EXTENSION_RULES.md`.
-3. Commit your changes and open a Pull Request against the `main` branch.
+### Release Package Installation
+1. Download the latest release ZIP package (`CommitDSA_v1.2.0.zip`) from the repository root or release page.
+2. Unzip the package to a local directory.
+3. Open `chrome://extensions/`, enable Developer mode, click **Load unpacked**, and select the unzipped folder.
 
-Happy Coding! 💻
+---
+
+## Configuration
+
+1. Open the extension popup from the browser toolbar.
+2. Click the gear icon to open **Settings**.
+3. Enable the target platforms (LeetCode, GeeksforGeeks).
+4. Enter your GFG handle (username) and LeetCode handle.
+5. Provide your **GitHub Personal Access Token (PAT)** with `repo` scope.
+6. Input your repository path in the `owner/repository` format.
+7. Select your synchronization mode: **Auto** (instant push) or **Manual** (modal prompt).
+8. Save settings and toggle the sync switch on the dashboard.
+
+---
+
+## Contribution Guidelines
+
+We welcome contributions to CommitDSA. To maintain codebase quality and security, contributors must adhere to our extension development rules:
+
+- Read **[Extension Rules (docs/EXTENSION_RULES.md)](docs/EXTENSION_RULES.md)** before writing code.
+- No background DOM scraping; service workers must use official platform endpoints.
+- Avoid using `setInterval` for DOM parsing; use event-driven interceptors.
+- Keep permissions scoped to the absolute minimum necessary in `manifest.json`.
+- Open a Pull Request from a dedicated feature branch (`git checkout -b feature/name`) against the `main` branch.

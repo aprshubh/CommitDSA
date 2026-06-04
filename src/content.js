@@ -19,6 +19,50 @@ injectScript();
 
 
 
+const PALETTE_COLORS = {
+  classic: {
+    dark: { accent: '#ffffff', glow: 'rgba(255, 255, 255, 0.15)', text: '#000000' },
+    light: { accent: '#000000', glow: 'rgba(0, 0, 0, 0.15)', text: '#ffffff' }
+  },
+  volt: {
+    dark: { accent: '#CCFF00', glow: 'rgba(204, 255, 0, 0.2)', text: '#000000' },
+    light: { accent: '#059669', glow: 'rgba(5, 150, 105, 0.2)', text: '#ffffff' }
+  },
+  violet: {
+    dark: { accent: '#A78BFA', glow: 'rgba(167, 139, 250, 0.2)', text: '#000000' },
+    light: { accent: '#7C3AED', glow: 'rgba(124, 58, 237, 0.2)', text: '#ffffff' }
+  },
+  orange: {
+    dark: { accent: '#FF6B00', glow: 'rgba(255, 107, 0, 0.2)', text: '#ffffff' },
+    light: { accent: '#E25800', glow: 'rgba(226, 88, 0, 0.2)', text: '#ffffff' }
+  },
+  frost: {
+    dark: { accent: '#38BDF8', glow: 'rgba(56, 189, 248, 0.2)', text: '#0f172a' },
+    light: { accent: '#0284C7', glow: 'rgba(2, 132, 199, 0.2)', text: '#ffffff' }
+  },
+  rose: {
+    dark: { accent: '#fb7185', glow: 'rgba(251, 113, 133, 0.2)', text: '#ffffff' },
+    light: { accent: '#e11d48', glow: 'rgba(225, 29, 72, 0.2)', text: '#ffffff' }
+  },
+  // Legacy aliases
+  indigo: {
+    dark: { accent: '#A78BFA', glow: 'rgba(167, 139, 250, 0.2)', text: '#000000' },
+    light: { accent: '#7C3AED', glow: 'rgba(124, 58, 237, 0.2)', text: '#ffffff' }
+  },
+  emerald: {
+    dark: { accent: '#CCFF00', glow: 'rgba(204, 255, 0, 0.2)', text: '#000000' },
+    light: { accent: '#059669', glow: 'rgba(5, 150, 105, 0.2)', text: '#ffffff' }
+  },
+  amber: {
+    dark: { accent: '#FF6B00', glow: 'rgba(255, 107, 0, 0.2)', text: '#ffffff' },
+    light: { accent: '#E25800', glow: 'rgba(226, 88, 0, 0.2)', text: '#ffffff' }
+  },
+  cyan: {
+    dark: { accent: '#38BDF8', glow: 'rgba(56, 189, 248, 0.2)', text: '#0f172a' },
+    light: { accent: '#0284C7', glow: 'rgba(2, 132, 199, 0.2)', text: '#ffffff' }
+  }
+};
+
 /**
  * Displays an in-page modal to prompt the user to manually push their solution to GitHub.
  * 
@@ -35,10 +79,17 @@ const showManualSyncModal = (submissionData) => {
   modal.id = 'algosync-manual-modal';
   modal.className = 'algosync-modal-overlay';
 
-  // Load the current theme to match the extension visual style
-  chrome.storage.local.get(['theme'], (res) => {
-    const activeTheme = res.theme || 'light';
+  // Load the current theme and color palette dynamically
+  chrome.storage.local.get(['theme', 'themeColor'], (res) => {
+    const activeTheme = res.theme || 'dark';
+    const activeColor = res.themeColor || 'classic';
     modal.classList.add(`theme-${activeTheme}`);
+
+    const colorConfig = PALETTE_COLORS[activeColor] || PALETTE_COLORS.classic;
+    const config = colorConfig[activeTheme] || colorConfig.dark;
+    modal.style.setProperty('--accent', config.accent);
+    modal.style.setProperty('--accent-glow', config.glow);
+    modal.style.setProperty('--accent-text', config.text);
   });
 
   const card = document.createElement('div');
@@ -47,14 +98,23 @@ const showManualSyncModal = (submissionData) => {
   const titleEl = document.createElement('div');
   titleEl.className = 'algosync-modal-header';
   
+  const logoArea = document.createElement('div');
+  logoArea.className = 'modal-logo-area';
+
+  const logoDot = document.createElement('span');
+  logoDot.className = 'modal-logo-dot';
+
   const logoSpan = document.createElement('span');
   logoSpan.className = 'algosync-modal-logo';
   logoSpan.textContent = 'CommitDSA';
+
+  logoArea.appendChild(logoDot);
+  logoArea.appendChild(logoSpan);
   
   const headerTitle = document.createElement('h3');
   headerTitle.textContent = 'Push to GitHub?';
   
-  titleEl.appendChild(logoSpan);
+  titleEl.appendChild(logoArea);
   titleEl.appendChild(headerTitle);
 
   const bodyEl = document.createElement('div');

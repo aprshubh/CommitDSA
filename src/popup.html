@@ -40,6 +40,15 @@
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         </button>
+        <button class="icon-btn" id="palette-btn" title="Accent Color">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.7255 3.09032 17.1962 4.85857 19C5.3216 19.463 5.34141 20.218 4.90807 20.7075L4.85857 20.7575C4.30629 21.3098 3.51868 21.5547 2.76615 21.3196C3.47355 21.7588 4.30396 22 5.19502 22H12Z"/>
+            <circle cx="7.5" cy="10.5" r="1.5" fill="currentColor"/>
+            <circle cx="11.5" cy="7.5" r="1.5" fill="currentColor"/>
+            <circle cx="16.5" cy="9.5" r="1.5" fill="currentColor"/>
+            <circle cx="15.5" cy="14.5" r="1.5" fill="currentColor"/>
+          </svg>
+        </button>
         <!-- Rank Badge (platform-specific) -->
         <div class="rank-badge" id="rank-badge">
           <span class="rank-emoji" id="rank-emoji">🏆</span>
@@ -47,6 +56,19 @@
         </div>
       </div>
     </header>
+
+    <!-- Palette Dropdown -->
+    <div class="palette-dropdown" id="palette-dropdown" style="display: none;">
+      <span class="palette-title">Choose Accent Color</span>
+      <div class="palette-options">
+        <button class="color-swatch active" data-color="classic" style="--swatch-color: linear-gradient(135deg, #000 49%, #fff 51%); --swatch-glow: rgba(128,128,128,0.5);" title="Classic (Monochrome)"></button>
+        <button class="color-swatch" data-color="volt" style="--swatch-color: #CCFF00;" title="Electric Volt"></button>
+        <button class="color-swatch" data-color="violet" style="--swatch-color: #A78BFA;" title="Cyber Violet"></button>
+        <button class="color-swatch" data-color="orange" style="--swatch-color: #FF6B00;" title="Sunset Orange"></button>
+        <button class="color-swatch" data-color="frost" style="--swatch-color: #38BDF8;" title="Nordic Frost"></button>
+        <button class="color-swatch" data-color="rose" style="--swatch-color: #fb7185;" title="Sakura Rose"></button>
+      </div>
+    </div>
 
     <!-- Platform Tabs -->
     <div class="platform-tabs" id="platform-tabs"></div>
@@ -83,7 +105,10 @@
 
     <!-- GitHub Push Toggle Row -->
     <div class="push-row" id="push-row">
-      <span class="push-label">GitHub Push</span>
+      <div class="push-label-wrap">
+        <span class="push-label">GitHub Push</span>
+        <span class="status-pulse" id="gh-status-dot"></span>
+      </div>
       <label class="toggle-switch" id="push-toggle-wrap">
         <input type="checkbox" id="push-toggle" />
         <span class="toggle-slider"></span>

@@ -100,19 +100,130 @@ function nextReset(platform) {
 }
 
 /* ================================================================
-   THEME
+   THEME & PALETTE SYSTEM
 ================================================================ */
+const PALETTE_COLORS = {
+  classic: {
+    dark: { accent: '#ffffff', glow: 'rgba(255, 255, 255, 0.15)', text: '#000000' },
+    light: { accent: '#000000', glow: 'rgba(0, 0, 0, 0.15)', text: '#ffffff' }
+  },
+  volt: {
+    dark: { accent: '#CCFF00', glow: 'rgba(204, 255, 0, 0.2)', text: '#000000' },
+    light: { accent: '#059669', glow: 'rgba(5, 150, 105, 0.2)', text: '#ffffff' }
+  },
+  violet: {
+    dark: { accent: '#A78BFA', glow: 'rgba(167, 139, 250, 0.2)', text: '#000000' },
+    light: { accent: '#7C3AED', glow: 'rgba(124, 58, 237, 0.2)', text: '#ffffff' }
+  },
+  orange: {
+    dark: { accent: '#FF6B00', glow: 'rgba(255, 107, 0, 0.2)', text: '#ffffff' },
+    light: { accent: '#E25800', glow: 'rgba(226, 88, 0, 0.2)', text: '#ffffff' }
+  },
+  frost: {
+    dark: { accent: '#38BDF8', glow: 'rgba(56, 189, 248, 0.2)', text: '#0f172a' },
+    light: { accent: '#0284C7', glow: 'rgba(2, 132, 199, 0.2)', text: '#ffffff' }
+  },
+  rose: {
+    dark: { accent: '#fb7185', glow: 'rgba(251, 113, 133, 0.2)', text: '#ffffff' },
+    light: { accent: '#e11d48', glow: 'rgba(225, 29, 72, 0.2)', text: '#ffffff' }
+  },
+  // Legacy aliases
+  indigo: {
+    dark: { accent: '#A78BFA', glow: 'rgba(167, 139, 250, 0.2)', text: '#000000' },
+    light: { accent: '#7C3AED', glow: 'rgba(124, 58, 237, 0.2)', text: '#ffffff' }
+  },
+  emerald: {
+    dark: { accent: '#CCFF00', glow: 'rgba(204, 255, 0, 0.2)', text: '#000000' },
+    light: { accent: '#059669', glow: 'rgba(5, 150, 105, 0.2)', text: '#ffffff' }
+  },
+  amber: {
+    dark: { accent: '#FF6B00', glow: 'rgba(255, 107, 0, 0.2)', text: '#ffffff' },
+    light: { accent: '#E25800', glow: 'rgba(226, 88, 0, 0.2)', text: '#ffffff' }
+  },
+  cyan: {
+    dark: { accent: '#38BDF8', glow: 'rgba(56, 189, 248, 0.2)', text: '#0f172a' },
+    light: { accent: '#0284C7', glow: 'rgba(2, 132, 199, 0.2)', text: '#ffffff' }
+  }
+};
+
+function applyAccentColor(colorName, theme) {
+  const body = document.body;
+  if (!body) return;
+  const colorConfig = PALETTE_COLORS[colorName] || PALETTE_COLORS.classic;
+  const config = colorConfig[theme] || colorConfig.dark;
+
+  body.style.setProperty('--accent', config.accent);
+  body.style.setProperty('--accent-glow', config.glow);
+  body.style.setProperty('--accent-text', config.text);
+}
+
 function initTheme() {
-  chrome.storage.local.get(['theme'], ({ theme }) => {
-    document.body.className = `theme-${theme || 'dark'}`;
+  chrome.storage.local.get(['theme', 'themeColor'], ({ theme, themeColor }) => {
+    const activeTheme = theme || 'dark';
+    const activeColor = themeColor || 'classic';
+    document.body.className = `theme-${activeTheme}`;
+    applyAccentColor(activeColor, activeTheme);
   });
+  
   const btn = document.getElementById('theme-toggle-btn');
   if (!btn) return;
   btn.addEventListener('click', () => {
     const isDark = document.body.classList.contains('theme-dark');
-    const next   = isDark ? 'light' : 'dark';
-    document.body.className = `theme-${next}`;
-    chrome.storage.local.set({ theme: next });
+    const nextTheme = isDark ? 'light' : 'dark';
+    document.body.className = `theme-${nextTheme}`;
+    chrome.storage.local.set({ theme: nextTheme });
+    
+    chrome.storage.local.get(['themeColor'], ({ themeColor }) => {
+      applyAccentColor(themeColor || 'classic', nextTheme);
+    });
+  });
+}
+
+function initPalette() {
+  const paletteBtn = document.getElementById('palette-btn');
+  const dropdown   = document.getElementById('palette-dropdown');
+  if (!paletteBtn || !dropdown) return;
+
+  paletteBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isShown = dropdown.style.display === 'block';
+    dropdown.style.display = isShown ? 'none' : 'block';
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target) && e.target !== paletteBtn) {
+      dropdown.style.display = 'none';
+    }
+  });
+
+  chrome.storage.local.get(['theme', 'themeColor'], ({ theme, themeColor }) => {
+    const activeColor = themeColor || 'classic';
+    const activeTheme = theme || 'dark';
+    
+    dropdown.querySelectorAll('.color-swatch').forEach(swatch => {
+      if (swatch.dataset.color === activeColor) {
+        swatch.classList.add('active');
+      } else {
+        swatch.classList.remove('active');
+      }
+    });
+
+    applyAccentColor(activeColor, activeTheme);
+  });
+
+  dropdown.querySelectorAll('.color-swatch').forEach(swatch => {
+    swatch.addEventListener('click', () => {
+      const color = swatch.dataset.color;
+      
+      dropdown.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+      swatch.classList.add('active');
+
+      chrome.storage.local.get(['theme'], ({ theme }) => {
+        const activeTheme = theme || 'dark';
+        applyAccentColor(color, activeTheme);
+        chrome.storage.local.set({ themeColor: color });
+      });
+    });
   });
 }
 
@@ -120,9 +231,16 @@ function initTheme() {
    VIEW SWITCHING
 ================================================================ */
 function showView(id) {
-  document.querySelectorAll('.view').forEach(v => (v.style.display = 'none'));
+  document.querySelectorAll('.view').forEach(v => {
+    v.style.display = 'none';
+    v.classList.remove('visible');
+  });
   const el = document.getElementById(id);
-  if (el) el.style.display = 'block';
+  if (el) {
+    el.style.display = 'block';
+    void el.offsetWidth; // Force reflow
+    el.classList.add('visible');
+  }
 }
 function showDashboard() { showView('dashboard-view'); }
 function showSettings()  {
@@ -134,6 +252,15 @@ function showSettings()  {
 /* ================================================================
    PLATFORM TABS — built dynamically from PLATFORMS config
 ================================================================ */
+function updateTabHighlight() {
+  const activeTab = document.querySelector('.tab-btn.active');
+  const highlight = document.getElementById('tab-highlight');
+  if (!activeTab || !highlight) return;
+
+  highlight.style.width     = `${activeTab.offsetWidth}px`;
+  highlight.style.transform = `translateX(${activeTab.offsetLeft}px)`;
+}
+
 function buildTabs() {
   const container = document.getElementById('platform-tabs');
   if (!container) return;
@@ -150,9 +277,15 @@ function buildTabs() {
       return;
     }
 
+    // Add sliding highlight
+    const highlight = document.createElement('div');
+    highlight.className = 'tab-highlight';
+    highlight.id        = 'tab-highlight';
+    container.appendChild(highlight);
+
     enabledPlats.forEach((cfg, i) => {
       const btn = document.createElement('button');
-      btn.className   = 'tab-btn' + (i === 0 ? ' active' : '');
+      btn.className   = 'tab-btn' + (cfg.id === activePlatform ? ' active' : '');
       btn.dataset.platform = cfg.id;
       btn.textContent = cfg.label;
       btn.addEventListener('click', () => {
@@ -162,6 +295,7 @@ function buildTabs() {
         updateRankBadge();
         restartCountdown();
         loadDashboard(false);
+        updateTabHighlight();
       });
       container.appendChild(btn);
     });
@@ -170,6 +304,16 @@ function buildTabs() {
     if (enabledPlats.length > 0 && !enabledList.includes(activePlatform)) {
       activePlatform = enabledPlats[0].id;
     }
+
+    container.querySelectorAll('.tab-btn').forEach(b => {
+      if (b.dataset.platform === activePlatform) {
+        b.classList.add('active');
+      } else {
+        b.classList.remove('active');
+      }
+    });
+
+    setTimeout(updateTabHighlight, 0);
   });
 }
 
@@ -352,6 +496,27 @@ function restartCountdown() {
 /* ================================================================
    GITHUB PUSH TOGGLE
 ================================================================ */
+function updateGitHubStatus() {
+  const dot = document.getElementById('gh-status-dot');
+  if (!dot) return;
+
+  chrome.storage.local.get(['githubToken', 'githubRepo', 'githubEnabled'], ({ githubToken, githubRepo, githubEnabled }) => {
+    const hasToken = !!(githubToken && githubToken.trim().length > 0);
+    const hasRepo = !!(githubRepo && githubRepo.trim().length > 0);
+
+    if (githubEnabled && hasToken && hasRepo) {
+      dot.className = 'status-pulse connected';
+      dot.title = 'GitHub Connected & Active';
+    } else if (hasToken || hasRepo) {
+      dot.className = 'status-pulse warning';
+      dot.title = 'Configuration Incomplete / Disabled';
+    } else {
+      dot.className = 'status-pulse';
+      dot.title = 'GitHub Sync Not Configured';
+    }
+  });
+}
+
 function initPushToggle() {
   const toggle  = document.getElementById('push-toggle');
   const hint    = document.getElementById('no-gh-hint');
@@ -363,6 +528,7 @@ function initPushToggle() {
   chrome.storage.local.get(['githubEnabled', 'githubToken'], ({ githubEnabled, githubToken }) => {
     if (toggle) toggle.checked = !!githubEnabled;
     if (hint)   hint.style.display = (githubEnabled && !githubToken) ? 'block' : 'none';
+    updateGitHubStatus();
   });
 
   if (!toggle) return;
@@ -373,9 +539,12 @@ function initPushToggle() {
         // Block enable — no token configured
         toggle.checked = false;
         if (hint) hint.style.display = 'block';
+        updateGitHubStatus();
         return;
       }
-      chrome.storage.local.set({ githubEnabled: want });
+      chrome.storage.local.set({ githubEnabled: want }, () => {
+        updateGitHubStatus();
+      });
       if (hint) hint.style.display = 'none';
     });
   });
@@ -384,6 +553,26 @@ function initPushToggle() {
 /* ================================================================
    LOAD DASHBOARD DATA
 ================================================================ */
+function setDashboardLoading(isLoading) {
+  const elements = [
+    document.getElementById('chal-diff'),
+    document.getElementById('chal-date'),
+    document.getElementById('chal-title'),
+    document.getElementById('stat-total'),
+    document.getElementById('solve-btn')
+  ];
+  document.querySelectorAll('.diff-val').forEach(el => elements.push(el));
+
+  elements.forEach(el => {
+    if (!el) return;
+    if (isLoading) {
+      el.classList.add('skeleton');
+    } else {
+      el.classList.remove('skeleton');
+    }
+  });
+}
+
 function loadDashboard(forceRefresh = false) {
   const cfg    = PLATFORMS[activePlatform];
   const prefix = cfg.prefix;
@@ -393,8 +582,11 @@ function loadDashboard(forceRefresh = false) {
   const statsKey       = activePlatform === 'leetcode' ? 'leetcode_solvedStats' : prefix + 'solvedStats';
   const dailyQuestKey  = activePlatform === 'leetcode' ? 'leetcode_dailyQuestion' : prefix + 'dailyQuestion';
 
+  // Start skeleton loading shimmer
+  setDashboardLoading(true);
+
   // Helper: read from storage and render
-  function renderFromStorage() {
+  function renderFromStorage(callback) {
     chrome.storage.local.get([completedKey, statsKey, dailyQuestKey], (data) => {
       const completedDates = data[completedKey] || [];
       const solvedStats    = data[statsKey]     || null;
@@ -403,24 +595,33 @@ function loadDashboard(forceRefresh = false) {
       renderChallenge(dailyQuestion, completedDates);
       renderStats(solvedStats);
       updateRankBadge();
+
+      // If we have cached content, turn off skeleton loading
+      if (solvedStats && dailyQuestion) {
+        setDashboardLoading(false);
+      }
+      if (callback) callback();
     });
   }
 
   // 1. Instant render from cache
-  renderFromStorage();
-
-  // 2. Ask background to refresh, then re-read storage for freshest data
-  const msgType = forceRefresh ? 'FORCE_REFRESH_DAILY' : 'GET_DASHBOARD_DATA';
-  chrome.runtime.sendMessage({ type: msgType, platform: activePlatform }, (res) => {
-    if (chrome.runtime.lastError) {
-      console.warn('[CommitDSA] Background msg error:', chrome.runtime.lastError.message);
-      return;
-    }
-    if (res && res.error && forceRefresh) {
-      showSyncError(res.error);
-    }
-    // Re-read from storage — background has now written fresh data there
-    renderFromStorage();
+  renderFromStorage(() => {
+    // 2. Ask background to refresh, then re-read storage for freshest data
+    const msgType = forceRefresh ? 'FORCE_REFRESH_DAILY' : 'GET_DASHBOARD_DATA';
+    chrome.runtime.sendMessage({ type: msgType, platform: activePlatform }, (res) => {
+      if (chrome.runtime.lastError) {
+        console.warn('[CommitDSA] Background msg error:', chrome.runtime.lastError.message);
+        setDashboardLoading(false);
+        return;
+      }
+      if (res && res.error && forceRefresh) {
+        showSyncError(res.error);
+      }
+      // Re-read from storage and turn off skeleton loading
+      renderFromStorage(() => {
+        setDashboardLoading(false);
+      });
+    });
   });
 }
 
@@ -439,7 +640,7 @@ function buildPlatformCards() {
       const isPlatEnabled  = enabledList.includes(cfg.id);
 
       const card = document.createElement('div');
-      card.className = 'platform-card';
+      card.className = `platform-card ${cfg.id}-card` + (isPlatEnabled ? ' active-card' : '');
       const header = document.createElement('div');
       header.className = 'pc-header';
       
@@ -455,6 +656,14 @@ function buildPlatformCards() {
       platInput.type = 'checkbox';
       platInput.id = `plat-toggle-${cfg.id}`;
       if (isPlatEnabled) platInput.checked = true;
+      
+      platInput.addEventListener('change', () => {
+        if (platInput.checked) {
+          card.classList.add('active-card');
+        } else {
+          card.classList.remove('active-card');
+        }
+      });
       
       const platSlider = document.createElement('span');
       platSlider.className = 'toggle-slider';
@@ -611,6 +820,7 @@ function saveSettings() {
     // Refresh the UI to immediately reflect platform changes
     buildTabs();
     updateGitHubButtonsState();
+    updateGitHubStatus();
   });
 }
 
@@ -619,6 +829,7 @@ function saveSettings() {
 ================================================================ */
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
+  initPalette();
 
   // Build tabs from PLATFORMS config
   buildTabs();

@@ -48,6 +48,30 @@ export function getFileExtension(lang) {
 }
 
 /**
+ * Determines the appropriate folder category based on platform and difficulty.
+ * 
+ * @param {string} platform - The platform ('LeetCode' or 'GFG').
+ * @param {string} difficulty - The raw difficulty level.
+ * @returns {string} The normalized subfolder name (e.g., 'Basic', 'Easy', 'Medium', 'Hard').
+ */
+export function getFolderCategory(platform, difficulty) {
+  if (!difficulty) return 'Medium';
+  const diffNormalized = difficulty.trim().toLowerCase();
+  
+  if (platform === 'LeetCode') {
+    if (diffNormalized.includes('easy')) return 'Easy';
+    if (diffNormalized.includes('hard')) return 'Hard';
+    return 'Medium';
+  } else if (platform === 'GFG') {
+    if (diffNormalized.includes('school') || diffNormalized.includes('basic')) return 'Basic';
+    if (diffNormalized.includes('easy')) return 'Easy';
+    if (diffNormalized.includes('hard')) return 'Hard';
+    return 'Medium';
+  }
+  return 'Medium';
+}
+
+/**
  * Pushes a solved coding challenge to the configured GitHub repository via the GitHub API.
  * 
  * @param {Object} data - The problem and solution data.
@@ -87,8 +111,9 @@ export async function pushToGitHub(data, config) {
   const extension = getFileExtension(lang);
   const filename = `${problemNumber}_${camelCaseTitle}.${extension}`;
   
-  // Organize directly by platform name (e.g. LeetCode, GFG)
-  const path = `${platform}/${filename}`;
+  // Organize directly by platform name and normalized difficulty category
+  const category = getFolderCategory(platform, difficulty);
+  const path = `${platform}/${category}/${filename}`;
 
   // 2. Format file content with header
   const problemUrl = platform === 'LeetCode' 
