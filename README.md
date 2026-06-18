@@ -76,7 +76,7 @@ CommitDSA is serverless by design.
 - Your GitHub Personal Access Token is stored only in `chrome.storage.local`.
 - API calls go directly from your browser to GitHub, LeetCode, or GeeksforGeeks.
 
-See the [Privacy Policy](https://aprshubh.github.io/commitdsa/privacy.html) for the full privacy policy.
+See the [Privacy Policy](https://aprshubh.github.io/CommitDSA/privacy.html) for the full privacy policy.
 
 ## Local Installation
 
@@ -105,7 +105,7 @@ The extension code uses plain ES modules with JSDoc type hints. There is no Type
 ## Documentation
 
 - [Project overview](PROJECT.md)
-- [Privacy Policy](https://aprshubh.github.io/commitdsa/privacy.html)
+- [Privacy Policy](https://aprshubh.github.io/CommitDSA/privacy.html)
 
 ## License
 
