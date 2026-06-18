@@ -1,67 +1,110 @@
-# CommitDSA: Chrome Extension for LeetCode and GeeksforGeeks GitHub Synchronization
+# CommitDSA
 
-CommitDSA is a serverless, privacy-first Google Chrome Extension designed to automatically synchronize and backup accepted coding solutions from LeetCode and GeeksforGeeks (GFG) directly to a specified GitHub repository. Built under the Manifest V3 specification, CommitDSA operates entirely client-side without relying on external databases or backend servers.
+CommitDSA is a privacy-first Chrome extension that syncs accepted LeetCode and GeeksforGeeks solutions directly from your browser to your GitHub repository.
 
----
+It has no backend server, no telemetry, and no account system. Your GitHub token, repo settings, solved problem queue, and platform preferences stay inside `chrome.storage.local` on your machine.
 
-## Key Features
+## Features
 
-- **Automated and Manual Synchronization**: Pushes solved problems immediately upon acceptance or prompts user confirmation via an in-page modal.
-- **Unified Developer Dashboard**: Displays LeetCode global ranking and GeeksforGeeks overall score side-by-side inside a dark-themed popup interface.
-- **Difficulty-Based Categorization (v1.2.0)**: Solutions are automatically sorted into difficulty-specific subdirectories inside the repository:
-  - **LeetCode**: `LeetCode/Easy/`, `LeetCode/Medium/`, `LeetCode/Hard/`
-  - **GeeksforGeeks**: `GFG/Basic/` (includes School and Basic), `GFG/Easy/`, `GFG/Medium/`, `GFG/Hard/`
-- **GeeksforGeeks Difficulty Resolution**: Directly parses the exact GFG metadata to prevent false categorization, resolving the common issue where all problems are classified as Medium.
-- **Privacy-Preserving Architecture**: GitHub Personal Access Tokens (PAT) and configurations are stored securely inside the browser's local sandbox (`chrome.storage.local`).
-- **Clean Code Headers**: Prefixes pushed code with structured comments containing the problem link, platform name, and difficulty rating.
+- Sync accepted LeetCode and GeeksforGeeks submissions to GitHub.
+- Choose manual confirmation or automatic sync.
+- Retry failed syncs through a persistent local queue.
+- Keep platform stats and daily challenge data in the popup.
+- Generate clean source files with problem metadata headers.
+- Update the target repository README with a DSA portfolio table.
+- Store all credentials locally in the browser sandbox.
 
----
+## Project Structure
 
-## Technical Architecture
+```text
+commitdsa/
+|-- scripts/
+|-- src/
+|   |-- assets/
+|   |   `-- icons/
+|   |-- background/
+|   |   |-- App.js
+|   |   `-- service_worker.js
+|   |-- content/
+|   |   |-- content.css
+|   |   `-- content.js
+|   |-- models/
+|   |   `-- types.js
+|   |-- platforms/
+|   |   |-- gfg/
+|   |   |   |-- inject.js
+|   |   |   `-- service.js
+|   |   `-- leetcode/
+|   |       |-- inject.js
+|   |       `-- service.js
+|   |-- services/
+|   |   |-- QueueService.js
+|   |   |-- StorageService.js
+|   |   `-- SyncService.js
+|   |-- ui/
+|   |   |-- popup/
+|   |   `-- welcome/
+|   |-- utils/
+|   `-- manifest.json
+|-- tests/
+|-- README.md
+|-- PROJECT.md
+|-- LICENSE
+|-- privacy.html
+|-- package.json
+`-- .gitignore
+```
 
-The extension is designed around modular, object-oriented concepts to ensure high performance and maintainability:
+## How It Works
 
-- **Object-Oriented Platform Layer**: Uses an abstract `CodingPlatform` class subclassed into `LeetCodePlatform` and `GfgPlatform`, managed via a `PlatformFactory`. This pattern simplifies onboarding new platforms.
-- **Dynamic Script Injection**: Content scripts are registered and unregistered dynamically using the `chrome.scripting` API based on user settings. If a platform is disabled, no code executes on its domains.
-- **Network Interception**: Intercepts `window.fetch` and `XMLHttpRequest` in the page's main world execution context (`inject.js`) to capture the exact submitted code upon acceptance.
-- **Alarm and Caching Manager**: Uses `AlarmManager` for scheduled background stat updates and caches results (1-hour TTL) to prevent rate limits.
+CommitDSA uses two browser execution contexts:
 
----
+1. Platform injectors run in the page context and watch submission network responses.
+2. The extension content script validates accepted submission messages and forwards them to the background service worker.
+3. The background app stores the solve in a local queue.
+4. The queue formats the source file and pushes it to GitHub through the GitHub Contents API.
+5. Failed syncs remain in local storage and are retried safely.
 
-## Installation
+## Privacy Model
 
-### Local Development Setup
-1. Clone this repository to your local system.
-2. Open Google Chrome and navigate to `chrome://extensions/`.
-3. Enable **Developer mode** via the toggle switch in the top-right corner.
-4. Click **Load unpacked** and select the `src/` directory from the cloned repository.
+CommitDSA is serverless by design.
 
-### Release Package Installation
-1. Download the latest release ZIP package (`CommitDSA_v1.2.0.zip`) from the repository root or release page.
-2. Unzip the package to a local directory.
-3. Open `chrome://extensions/`, enable Developer mode, click **Load unpacked**, and select the unzipped folder.
+- No backend server receives your code.
+- No analytics scripts are included.
+- Your GitHub Personal Access Token is stored only in `chrome.storage.local`.
+- API calls go directly from your browser to GitHub, LeetCode, or GeeksforGeeks.
 
----
+See [privacy.html](privacy.html) for the full privacy policy.
 
-## Configuration
+## Local Installation
 
-1. Open the extension popup from the browser toolbar.
-2. Click the gear icon to open **Settings**.
-3. Enable the target platforms (LeetCode, GeeksforGeeks).
-4. Enter your GFG handle (username) and LeetCode handle.
-5. Provide your **GitHub Personal Access Token (PAT)** with `repo` scope.
-6. Input your repository path in the `owner/repository` format.
-7. Select your synchronization mode: **Auto** (instant push) or **Manual** (modal prompt).
-8. Save settings and toggle the sync switch on the dashboard.
+1. Clone this repository.
+2. Open Chrome and visit `chrome://extensions/`.
+3. Enable Developer mode.
+4. Click Load unpacked.
+5. Select the `src/` directory.
 
----
+## Development
 
-## Contribution Guidelines
+Install dependencies:
 
-We welcome contributions to CommitDSA. To maintain codebase quality and security, contributors must adhere to our extension development rules:
+```bash
+npm install
+```
 
-- Read **[Extension Rules (docs/EXTENSION_RULES.md)](docs/EXTENSION_RULES.md)** before writing code.
-- No background DOM scraping; service workers must use official platform endpoints.
-- Avoid using `setInterval` for DOM parsing; use event-driven interceptors.
-- Keep permissions scoped to the absolute minimum necessary in `manifest.json`.
-- Open a Pull Request from a dedicated feature branch (`git checkout -b feature/name`) against the `main` branch.
+Run tests:
+
+```bash
+npm test
+```
+
+The extension code uses plain ES modules with JSDoc type hints. There is no TypeScript build step and no runtime bundler.
+
+## Documentation
+
+- [Project overview](PROJECT.md)
+- [Privacy policy](privacy.html)
+
+## License
+
+CommitDSA is licensed under the MIT License. See [LICENSE](LICENSE).

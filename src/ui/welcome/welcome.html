@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to CommitDSA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="welcome.css">
+</head>
+<body class="theme-light">
+  
+  <div class="welcome-container">
+    
+    <!-- Header Row -->
+    <header class="header">
+      <div class="logo-area">
+        <span class="logo-dot"></span>
+        <span class="logo-title">Commit<span>DSA</span></span>
+      </div>
+      
+      <!-- Theme Switcher Pill -->
+      <button class="theme-toggle" id="theme-toggle" title="Toggle Theme">
+        <span class="toggle-slider"></span>
+        <span class="icon sun">☀️</span>
+        <span class="icon moon">🌙</span>
+      </button>
+    </header>
+
+    <!-- Main Responsive Grid Layout (Landscape split screen) -->
+    <main class="grid-layout">
+      
+      <!-- Left Column (Overview, Diagram & Security) -->
+      <section class="col-left">
+        
+        <!-- Welcome Hero -->
+        <div class="hero-card fade-in">
+          <span class="badge">Success</span>
+          <h1 class="title">Successfully Installed!</h1>
+          <p class="subtitle">Your ultimate companion to automatically sync your LeetCode & GeeksforGeeks solutions directly to your GitHub repository.</p>
+        </div>
+
+        <!-- Animated Flow Diagram Card -->
+        <div class="glass-card fade-in delay-1">
+          <div class="card-header">
+            <span class="card-icon">🔄</span>
+            <h3>Data Sync Flow</h3>
+          </div>
+          <div class="flow-diagram-container">
+            <svg class="flow-diagram" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="grad-lc" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ffa116" />
+                  <stop offset="100%" stop-color="#ff6b00" />
+                </linearGradient>
+                <linearGradient id="grad-gfg" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#0f9d58" />
+                  <stop offset="100%" stop-color="#006b3c" />
+                </linearGradient>
+                <linearGradient id="grad-core" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#0284c7" />
+                  <stop offset="100%" stop-color="#38bdf8" />
+                </linearGradient>
+                <linearGradient id="grad-gh" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#2c3036" />
+                  <stop offset="100%" stop-color="#181a1e" />
+                </linearGradient>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+
+              <!-- Paths/Connections -->
+              <path class="flow-line line1" d="M80,35 Q130,35 160,60" fill="none" stroke="var(--border-color)" stroke-width="2" />
+              <path class="flow-line line2" d="M80,85 Q130,85 160,60" fill="none" stroke="var(--border-color)" stroke-width="2" />
+              <path class="flow-line line3" d="M240,60 H320" fill="none" stroke="var(--border-color)" stroke-width="2" />
+
+              <!-- Animated Glowing Dots -->
+              <circle class="flow-dot dot1" r="3.5" fill="#ffa116" filter="url(#glow)">
+                <animateMotion dur="3.5s" repeatCount="indefinite" path="M80,35 Q130,35 160,60" />
+              </circle>
+              <circle class="flow-dot dot2" r="3.5" fill="#0f9d58" filter="url(#glow)">
+                <animateMotion dur="3.5s" repeatCount="indefinite" path="M80,85 Q130,85 160,60" />
+              </circle>
+              <circle class="flow-dot dot3" r="3.5" fill="var(--color-primary)" filter="url(#glow)">
+                <animateMotion dur="2.8s" repeatCount="indefinite" path="M240,60 H320" />
+              </circle>
+
+              <!-- LeetCode Node -->
+              <g transform="translate(10, 15)">
+                <rect width="70" height="40" rx="8" fill="url(#grad-lc)" />
+                <text x="35" y="24" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle" font-family="inherit">LeetCode</text>
+              </g>
+
+              <!-- GFG Node -->
+              <g transform="translate(10, 65)">
+                <rect width="70" height="40" rx="8" fill="url(#grad-gfg)" />
+                <text x="35" y="24" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle" font-family="inherit">GFG</text>
+              </g>
+
+              <!-- Core Extension Node -->
+              <g transform="translate(160, 40)" filter="url(#glow)">
+                <rect width="80" height="40" rx="8" fill="url(#grad-core)" />
+                <text x="40" y="24" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle" font-family="inherit">CommitDSA</text>
+              </g>
+
+              <!-- GitHub Node -->
+              <g transform="translate(320, 40)">
+                <rect width="70" height="40" rx="8" fill="url(#grad-gh)" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+                <text x="35" y="24" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle" font-family="inherit">GitHub</text>
+              </g>
+            </svg>
+          </div>
+          <div class="note-banner">
+            <span class="note-icon">✨</span>
+            <div class="note-content">
+              <strong>Interactive:</strong> CommitDSA syncs solved problems and displays a manual confirmation overlay inside your browser context for privacy-first control.
+            </div>
+          </div>
+        </div>
+
+        <!-- Security & Privacy Card -->
+        <div class="glass-card fade-in delay-2">
+          <div class="card-header">
+            <span class="card-icon">🔒</span>
+            <h3>100% Private & Secure</h3>
+          </div>
+          <div class="security-content">
+            <ul class="security-list">
+              <li>
+                <strong>Local Storage Only:</strong> All configurations, GitHub Personal Access Tokens, and solving states are stored directly in your local browser sandbox (<code>chrome.storage.local</code>).
+              </li>
+              <li>
+                <strong>Serverless Architecture:</strong> CommitDSA runs entirely in the background worker of your browser. We have zero external servers, analytics tracking scripts, or telemetry databases.
+              </li>
+              <li>
+                <strong>Encrypted Direct APIs:</strong> The extension connects straight from your client machine to the official GitHub API via HTTPS protocols, keeping all data transfers secure.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Right Column (Wizard Steps & API Configurations) -->
+      <section class="col-right">
+        
+        <!-- Quick Start Steps -->
+        <div class="glass-card fade-in delay-1">
+          <div class="card-header">
+            <span class="card-icon">🚀</span>
+            <h3>Quick Start Steps</h3>
+          </div>
+          <div class="steps-list">
+            <div class="step-item">
+              <div class="step-number">1</div>
+              <div class="step-body">
+                <h4>Pin the Extension</h4>
+                <p>Click the Puzzle piece icon in your Chrome toolbar, find <strong>CommitDSA</strong>, and click the Pin icon to lock it for easy access.</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-number">2</div>
+              <div class="step-body">
+                <h4>Login to Platforms</h4>
+                <p>Make sure you are signed in on <a href="https://leetcode.com" target="_blank" rel="noopener noreferrer">leetcode.com</a> and <a href="https://practice.geeksforgeeks.org/" target="_blank" rel="noopener noreferrer">geeksforgeeks.org</a> so the extension can detect your accepted submissions.</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-number">3</div>
+              <div class="step-body">
+                <h4>Start Coding!</h4>
+                <p>Solve challenges! Upon acceptance, a confirmation banner will prompt you to push your solution. View your statistics inside the extension popup.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GitHub Integration Guide -->
+        <div class="glass-card fade-in delay-2">
+          <div class="card-header">
+            <span class="card-icon">⚙️</span>
+            <h3>GitHub & API Configuration</h3>
+          </div>
+          <div class="config-guide">
+            <p class="config-subtitle">Configure these parameters inside the extension popup's settings menu:</p>
+            
+            <div class="config-item">
+              <div class="config-badge">1</div>
+              <div class="config-body">
+                <h4>Generate GitHub Token (PAT)</h4>
+                <p>You need a secure token to allow the extension to write solutions to your repository. <strong>Do NOT select any extra checkboxes (only select "repo").</strong></p>
+                <ol class="config-list">
+                  <li>Visit the <a href="https://github.com/settings/tokens/new?scopes=repo&description=CommitDSA" target="_blank" rel="noopener noreferrer">GitHub New Token Page</a>.</li>
+                  <li>Verify that <strong>only</strong> the <code>repo</code> checkbox is selected.</li>
+                  <li>Click <strong>Generate token</strong> at the bottom, and copy the key (it starts with <code>ghp_</code>).</li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="config-item">
+              <div class="config-badge">2</div>
+              <div class="config-body">
+                <h4>Configure Repository Path</h4>
+                <p>Set the path of your target repository in your extension settings.</p>
+                <ol class="config-list">
+                  <li>Create a new repository (Public or Private) via the <a href="https://github.com/new" target="_blank" rel="noopener noreferrer">New Repository Page</a>. <strong>Important:</strong> Check the box to <strong>"Add a README file"</strong> to initialize the default branch.</li>
+                  <li>Copy your path formatted as <code>username/repo-name</code>. For example: <span class="code-badge">aprshubh/DSA</span>.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <footer class="footer">
+      <p>Happy Coding! Keep syncing your progress. 🚀 • <a href="/privacy.html" target="_blank" style="color: var(--color-primary); text-decoration: none; font-weight: 500;">Privacy Policy</a></p>
+    </footer>
+
+  </div>
+
+  <script src="welcome.js"></script>
+</body>
+</html>

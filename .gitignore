@@ -23,3 +23,6 @@ Thumbs.db
 # Assets directory
 assets/
 
+# Node dependencies
+node_modules/
+

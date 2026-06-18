@@ -7,9 +7,9 @@ def build_extension():
     # Define paths
     project_root = Path(__file__).resolve().parent.parent
     src_dir = project_root / 'src'
-    dist_dir = project_root / 'dist'
+    dist_dir = project_root.parent / 'Zips'
     
-    # Ensure dist directory exists
+    # Ensure Zips directory exists
     dist_dir.mkdir(exist_ok=True)
     
     # Get version from manifest.json
