@@ -1,5 +1,7 @@
 # CommitDSA
 
+[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Install-blue?style=for-the-badge&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/hnkhnpgnfccaeicaaekcooopbpncnkgm?utm_source=item-share-cb)
+
 CommitDSA is a privacy-first Chrome extension that syncs accepted LeetCode and GeeksforGeeks solutions directly from your browser to your GitHub repository.
 
 It has no backend server, no telemetry, and no account system. Your GitHub token, repo settings, solved problem queue, and platform preferences stay inside `chrome.storage.local` on your machine.
@@ -74,7 +76,7 @@ CommitDSA is serverless by design.
 - Your GitHub Personal Access Token is stored only in `chrome.storage.local`.
 - API calls go directly from your browser to GitHub, LeetCode, or GeeksforGeeks.
 
-See [privacy.html](privacy.html) for the full privacy policy.
+See the [Privacy Policy](https://aprshubh.github.io/commitdsa/privacy.html) for the full privacy policy.
 
 ## Local Installation
 
@@ -103,7 +105,7 @@ The extension code uses plain ES modules with JSDoc type hints. There is no Type
 ## Documentation
 
 - [Project overview](PROJECT.md)
-- [Privacy policy](privacy.html)
+- [Privacy Policy](https://aprshubh.github.io/commitdsa/privacy.html)
 
 ## License
 
